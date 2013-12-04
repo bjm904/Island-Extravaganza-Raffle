@@ -1,0 +1,139 @@
+<html>
+<head>
+	<title>IE</title>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<meta name="generator" content="Geany 1.22" />
+	<script type="text/javascript" src="browser.js"></script>
+	<script src="Prizes.js"></script>
+	<script src="config.js"></script>
+</head>
+<body style="background:black;">
+
+<canvas width="1014" height="750" id="ie" style="padding:0px;"></canvas>
+<script>
+if(browser != true){
+document.write("Please use Google Chrome");
+} else{
+
+var realConfSpeed = 120-(confSpeed+10)*5;
+
+
+var allImg=["check"];
+for(i=0;i<allImg.length;i++){
+window["img"+allImg[i]]=new Image();
+window["img"+allImg[i]].src=allImg[i]+".png";
+}
+
+
+var canvas=document.getElementById("ie");
+var context=canvas.getContext("2d");
+
+function draw(){
+//Background
+context.fillStyle="#000000";
+context.fillRect(0,0,1014,750);
+
+if(cur=="grand"){ // IF only showing grand prize
+
+context.fillStyle="#ffffff";
+context.font="75px Arial";
+context.fillText(pri[0][0][1],-800,100);
+context.fillText(pri[0][1][1],-800,200);
+
+//reload page
+setTimeout(function(){
+   window.location.reload(1);
+}, 5000);
+} else {
+
+if(cur=="all") var current=0;
+else var current=cur;
+var u=0;
+
+var tot=1;
+var y=0;
+if(cur=="all"){
+for(i=0;i<pri.length;i++){
+for(o=0;o<pri[i].length;o++){
+if(pri[i][o][1]!==0){
+tot++;
+}}}} else {
+for(o=0;o<pri[cur].length;o++){
+if(pri[cur][o][1]!==0){
+tot++;
+}}}
+
+for(i=0;i<tot*3;i++){
+
+var t=i%pri[current].length;
+if (i%pri[current].length==0){
+u=0;
+if(cur=="all"){
+if(current>=pri.length-1)current=0;
+else current++;
+}
+}
+else u++;
+
+if(i%2==0){
+context.fillStyle=color2;
+} else {
+context.fillStyle=color3;
+}
+if(yPos+40*i>-40&&yPos+40*i<1024) context.fillRect(0,yPos+40*i,1014,40);
+
+if(pri[current][u][1]!==0){
+context.fillStyle=color1;
+context.font="25px Arial";
+var yfill = 30+yPos+40*(i+y);
+if(yfill>0&&yfill<1024){
+context.fillText(pri[current][u][0],20,yfill);
+context.fillText(pri[current][u][1],100,yfill);
+context.fillText(pri[current][u][2],700,yfill);
+}
+if(pri[current][u][3]==true){
+var img=window["imgcheck"];
+if(15+yPos+40*(i+y)>0&&15+yPos+40*(i+y)<1024) context.drawImage(img,985,15+yPos+40*(i+y),15,15); //Beginning of line keeps it from rendering when off screen
+}
+} else y--;
+
+//Reload when hits 7:am again
+if(Math.abs(yPos)==tot*40-40) location.reload();
+}
+//ScrollBar
+context.fillStyle="#000000";
+context.fillRect(0,710,1024,40);
+
+context.fillStyle="#ffffff";
+context.font="25px Arial";
+var text=scrollbarConf
+var multiplyer=ScrollbarSpacingMultiplyer;
+for(f=0;f<100;f++){
+context.fillText(text,20+yPos+text.length*multiplyer*f,740);
+}
+
+}//end checking for grand prize
+}//end canvas drawing
+
+
+var cur=confShow;
+
+
+//Function to fill arrays to fix issue.
+var max=Math.max(pri[0].length,pri[1].length,pri[2].length,pri[3].length);
+for(l=0;l<pri.length;l++){
+while(pri[l].length<max) pri[l].push([0,0,0,false]);
+}
+
+
+var yPos=0;
+setInterval(function(){
+yPos--;
+draw();
+},realConfSpeed);
+
+
+}
+</script>
+</body>
+</html>
