@@ -1,4 +1,4 @@
-var confSpeed = 24;
+var confSpeed = 4;
 var confShow = "all"; 
 var ScrollbarSpacingMultiplyer= 13;
 var color1="black";var color2="#CC9900";var color3="#FFCC00";

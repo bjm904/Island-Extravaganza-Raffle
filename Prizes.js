@@ -6,7 +6,8 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 //START GRAND PRIZE  \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-["","                                                   Bert J Meyer","",false],
+["","                                      !-!- Trip for two to Hawaii -!-!",""],
+["","                                              Drawing at 10:00pm",""],
 
 //STOP /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ 
 
@@ -16,7 +17,7 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 ["","","",false],
 ["","","",false]],[
-["","                                                      7:00 Raffle","",false],
+["","                                                      7:30 Raffle","",false],
 
 
 
@@ -24,17 +25,16 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 //START 7:00pm RAFFLE  \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-[701,"Snowboard","Bob ",false],
-[702,"Gift Certificate to A Plus, $85 ","John Copenhagen",true],
-[703,"Gift Certificate to Robertos, $25","Angela Meyer",false],
-[704,"Tshirt, gloves and gaiter ","Jason",false],
-[705,"Gift card for vons","Fluttershy",false],
-[706,"Tshirt","Mika",false],
-[707,"You are awesome gift card","Wilbert",false],
-[708,"Gift Certificate to Bonnie's Pets, $20","Steve",false],
-[709,"iPad Air","Diego Pezoa",false],
-[710,"iPhone 5s","Vicente Reyes",false],
-[711,"iPhone 5s 500TB","Diego Pezoa",false],
+[730,"Buff Gator","",false],
+[731,"Hurley Backpack and Hat","",false],
+[732,"$100 Gift Certificate to American Beauty","",false],
+[733,"$40 Gift Certificate to Bleu","",false],
+[734,"$25 Gift Certificate to Booky Joint","",false],
+[735,"$25 Gift Certificate to Gomez's","",false],
+[736,"$25 Gift Certificate to Our Water Works","",false],
+[737,"Ladies Buff and Gloves","",false],
+[738,"Mens Thermal Tee and Gloves","Cara Leonard",true],
+[739,"Womens Gloves and Turtleneck","Bryce Meyer",false],
 
 //STOP /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ 
 
@@ -43,7 +43,7 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 
 ["","","",false]],
-[["","                                                      8:00 Raffle","",false],
+[["","                                                      8:30 Raffle","",false],
 
 
 
@@ -51,11 +51,17 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 //START 8:00pm RAFFLE  \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-[801,"Gift Certificate to Oak Tree, $25","Hector",true],
-[802,"MMSA Tshirt","George",false],
-[803,"iPhone case","Kat",false],
-[804,"Gravis backpack","Tim",false],
-[805,"Analog, Scott raffle bag","Andreas",false],
+[830,"Buff Gator","",false],
+[831,"$25 Gift Certificate to CJs Grill","",false],
+[832,"Free Haircut at CatWalk Salon","",false],
+[833,"$25 Gift Certificate to Giovanni's Pizza","",false],
+[834,"$50 Gift Certificate to 1st Street Leather","",false],
+[835,"$20 Gift Certificate to Old New York Deli","",false],
+[836,"$25 Gift Certificate to Our Water Works","",false],
+[837,"$10 Gift Certificate to Sage to Summit","",false],
+[838,"Mens Buff and Gloves","",false],
+[839,"Mens Thermal Tee and Gloves","",false],
+[840,"Womens Gloves and Turtleneck","",false],
 
 //STOP /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ 
 
@@ -64,7 +70,7 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 
 ["","","",false]],
-[["","                                                      9:00 Raffle","",false],
+[["","                                                      9:30 Raffle","",false],
 
 
 
@@ -72,10 +78,17 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 //START 9:00pm RAFFLE  \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-[901,"Tshirt, scarf, and wallet","Mike",true],
-[902,"goggles, hat, and Tshirt","Joe",true],
-[903,"kitties","Matt",false],
-[904,"Shoes, gloves, and Tshirt","Mark",false],
+[930,"Buff Gator","",false],
+[931,"$25 Gift Certificate to Giovanni's Pizza","",false],
+[932,"$25 Gift Certificate to Gomez's","",false],
+[933,"$10 Gift Certificate to Hair by Carrie","",false],
+[934,"$20 Gift Certificate to Old New York Deli","",false],
+[935,"Gloves","",false],
+[936,"$25 Gift Certificate to Robertos","",false],
+[937,"$50 Gift Certificate to Snowcreek Athletic Club","",false],
+[938,"1 Haircut at Blazing Sears","",false],
+[939,"$25 Gift Certificate to Perry's Cafe","",false],
+[940,"$25 Gift Certificate to Stove Restaurant","",false],
 
 //STOP /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ /\ 
 
