@@ -25,9 +25,9 @@ var pri=[[["","                                          ~~~   Grand Prize   ~~~
 
 //START 7:00pm RAFFLE  \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/ \/
 
-[730,"Buff Gator","",false],
-[731,"Hurley Backpack and Hat","",false],
-[732,"$100 Gift Certificate to American Beauty","",false],
+[730,"Buff Gator","Joe Smith",false],
+[731,"Hurley Backpack and Hat","Jeffery Hanks",true],
+[732,"$100 Gift Certificate to American Beauty","Carol McBride",false],
 [733,"$40 Gift Certificate to Bleu","",false],
 [734,"$25 Gift Certificate to Booky Joint","",false],
 [735,"$25 Gift Certificate to Gomez's","",false],
