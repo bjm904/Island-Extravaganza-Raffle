@@ -1,0 +1,135 @@
+<html>
+<head>
+	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+	<script type="text/javascript" src="files/browser.js"></script>
+	<script type="text/javascript" src="files/reconnecting-websocket.js"></script>
+	<script type="text/javascript" src="files/jquery-2.1.1.min.js"></script>
+	<title>Controls</title>
+</head>
+<body style="background:black;padding:0px;color:white;">
+
+<script type="text/javascript">
+if(browser != true){
+document.write("Please use Google Chrome");
+} else{
+
+//"Thank you to all our donors and volunteers: (List of doners here)"
+var gotFromServer;
+var debug;
+var spool;
+var ticker;
+var grand;
+var showing;
+
+
+var websocket = new ReconnectingWebSocket("ws://localhost:6458");
+websocket.onopen = function(evt) { websocketOpen(evt); };
+websocket.onclose = function(evt) { websocketClose(evt); };
+websocket.onmessage = function(evt) { websocketMessage(evt); };
+websocket.onerror = function(evt) { websocketError(evt); };
+
+function websocketOpen(evt){
+	console.log("Connected");
+	$("#settings").show();
+	$("#runCmd").html("Please run start.cmd");
+	$("#runCmd").hide();
+}
+function websocketClose(evt){
+	console.log("Disconnected");
+	$("#settings").hide();
+	$("#runCmd").html("Please run start.cmd");
+	$("#runCmd").show();
+}
+function websocketMessage(evt){
+	console.log("Got Update");
+	var com=JSON.parse(evt.data);
+	if(com.type=="update"){
+		gotFromServer=true;
+		if(com.spool) spool=com.spool;
+		if(com.ticker) ticker=com.ticker;
+		if(com.grand) grand=com.grand;
+		if(com.showing) showing=com.showing;
+		$("#spoolSpeed").val(spool.speed);
+		$("#spoolColor").val(spool.color);
+		$("#spoolBgColor1").val(spool.bgColor1);
+		$("#spoolBgColor2").val(spool.bgColor2);
+		
+		$("#tickerSpeed").val(ticker.speed);
+		$("#tickerText").val(ticker.text);
+		$("#tickerColor").val(ticker.color);
+		$("#tickerBgColor").val(ticker.bgColor);
+		
+		var grandText="";
+		for(i=0;i<grand.length;i++){
+			grandText+=grand[i]+"\n";
+		}
+		grandText=grandText.substring(0, grandText.length-1);
+		$("#grand").val(grandText);
+	} else if(com.type=="debug"){
+		debug=com.debug;
+		$("#debug").val("Debug: "+((debug)?"On":"Off"));
+	}
+}
+function websocketError(evt){
+	console.log("Server Error");
+}
+function sendUpdate(){
+	if(gotFromServer){
+		
+		spool.speed=$("#spoolSpeed").val();
+		spool.color=$("#spoolColor").val();
+		spool.bgColor1=$("#spoolBgColor1").val();
+		spool.bgColor2=$("#spoolBgColor2").val();
+		
+		ticker.speed=$("#tickerSpeed").val();
+		ticker.text=$("#tickerText").val();
+		ticker.color=$("#tickerColor").val();
+		ticker.bgColor=$("#tickerBgColor").val();
+
+		grand=$('#grand').val().split(/\n/);
+		
+		websocket.send(JSON.stringify({type:"update", spool:spool, ticker:ticker, grand:grand, showing:showing}));
+	}
+}
+function toggleDebug(bool){
+	websocket.send(JSON.stringify({type:"debug", debug:bool}));
+}
+
+$(document).on("click", "#debug", function(){
+	toggleDebug(!debug);
+});
+$(document).on("click", "#submit", function(){
+	sendUpdate();
+});
+}
+</script>
+<h1>Raffle</h1>
+<a href="files/spool.html" target="_blank" style="color:white;">Open Projector Page</a><br><br>
+<span id="runCmd" style="background:red;border:2px solid darkRed;padding:2px;">Loading...</span><br><br>
+<input type="button" id="debug" value="Debug: Off"></input>
+
+<br><br>
+
+<div id="settings" style="display:none;">
+Spool Speed:<select id="spoolSpeed" value="20"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
+<label>Spool Text Color:<input type="color" id="spoolColor"></input></label><br>
+Spool Background 1 &amp; 2:<input type="color" id="spoolBgColor1"></input><input type="color" id="spoolBgColor2"></input><br>
+
+<br><br>
+
+<label>Ticker Text:<input type="text" id="tickerText"></input></label><br>
+Ticker Speed:<select id="tickerSpeed" value="20"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
+<label>Ticker Text Color:<input type="color" id="tickerColor"></input></label><br>
+Ticker Background:<input type="color" id="tickerBgColor"></input><br>
+
+<br><br>
+
+Grand Prize Text: (Use Multiple Lines)<br>
+<textarea id="grand" rows="3"></textarea><br>
+
+
+<input type="button" id="submit" value="Save"></input>
+</div>
+<div style="position:fixed;bottom:10;right:10;">Code by <a href="https://brycejmeyer.com/" style="color:orange;" target="_blank">Bryce J. Meyer</a></div>
+</body>
+</html>
