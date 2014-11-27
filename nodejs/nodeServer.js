@@ -1,3 +1,22 @@
+console.log("Version 2.3");
+console.log("Created by Bryce J. Meyer");
+console.log("https://brycejmeyer.com/");
+console.log("For Disabled Sports Eastern Sierra");
+console.log("");
+console.log("Open Controls.html in a browser to start");
+console.log("");
+
+var opened;
+var openInterval=setInterval(function(){
+	if(!opened){
+		console.log("");
+		console.log("Open Controls.html in a browser to start");
+		console.log("");
+	} else{
+		clearInterval(openInterval);
+	}
+}, 7000);
+
 var fs = require('fs');
 var WebSocketServer = require('ws').Server;
 var wss = new WebSocketServer({port: 6458});
@@ -6,14 +25,17 @@ var clients=[];
 
 var showing=false;
 var ticker={
+enable:true,
+go:true,
 speed:40,
-text:"No Data to Display",
+text:"",
 color:"#ffffff",
 bgColor:"#000000"
 }
 var spool={
-speed:20,
-titles:["","",""],
+go:true,
+speed:40,
+titles:["","Raffle 1","Raffle 2"],
 prizes:[[
 	{
 	number:"",
@@ -59,7 +81,7 @@ fs.exists('../database', function(exists){
 	var flag;
 	if(!exists){
 		saveDb();
-		console.log("New database created");
+		log("New database created");
 	} else{
 		var raw = JSON.parse(fs.readFileSync('../database', 'utf8'));
 		if(raw.spool&&raw.ticker&&raw.grand){
@@ -67,7 +89,9 @@ fs.exists('../database', function(exists){
 			ticker=raw.ticker;
 			grand=raw.grand;
 			showing=raw.showing;
-			console.log("Loaded from Database");
+			spool.go=true;
+			ticker.go=true;
+			log("Loaded from Database");
 		} else{
 			saveDb();
 		}
@@ -77,15 +101,19 @@ fs.exists('../database', function(exists){
 function saveDb(){
 	fs.writeFile("../database", JSON.stringify({spool:spool, ticker:ticker, grand:grand, showing:showing}), function(err){
 		if(err){
-			console.log(err);
+			log(err);
 		} else{
-			console.log("Database saved");
+			log("Database saved");
 		}
 	});
 }
-
+function log(text){
+	var time=new Date();
+	console.log("["+("0"+Number(time.getHours())).slice(-2)+":"+("0"+Number(time.getMinutes())).slice(-2)+":"+("0"+Number(time.getSeconds())).slice(-2)+"] "+text);
+}
 wss.on('connection', function(ws){
-	console.log("Connection");
+	opened=true;
+	log("Connection");
 	clients.push({ws:ws});
 	if(ws) ws.send(JSON.stringify({type:"update", spool:spool, ticker:ticker, grand:grand, showing:showing}));
     ws.on('message', function(message){

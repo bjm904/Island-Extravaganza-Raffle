@@ -5,7 +5,7 @@
 	<script type="text/javascript" src="reconnecting-websocket.js"></script>
 	<script type="text/javascript" src="stats.js"></script>
 		<script type="text/javascript" src="jquery-2.1.1.min.js"></script>
-	<title>Spool</title>
+	<title>Projector</title>
 </head>
 <body style="background:black;padding:0px;">
 
@@ -27,6 +27,8 @@ var tickerOffset=0;
 var list=[];
 var spoolInterval;
 var tickerInterval;
+var gotFromServer;
+var debug;
 var errorText = "Loading...";
 
 var showing;
@@ -61,15 +63,15 @@ statsDraw.begin();
 window.requestAnimationFrame(draw);
 context.clearRect(0, 0, canvas.width, canvas.height);
 
-if(showing){ // IF only showing grand prize
+if(showing&&showing[0]=="grand"){ // IF only showing grand prize
 	context.textAlign="center";
 	context.fillStyle=spool.color;
 	context.font="75px Arial";
-	var height=((canvas.height-tickerHeight)-(grand.length*100))/2;
+	var height=(grand.length*100)/2;
 	for(i=0;i<grand.length;i++){
 		context.fillText(grand[i], canvas.width/2, height+(i*100));
 	}
-} else{
+} else if(showing&&showing[0]==true){
 	if(list.length==0){
 		context.textAlign="center";
 		context.fillStyle="#ffffff";
@@ -87,7 +89,6 @@ if(showing){ // IF only showing grand prize
 			context.fillText(item.title, canvas.width/2, item.y+6);
 		} else{
 			context.textAlign="start";
-			if(!spool.prizes[item.group]) console.log(item);
 			context.fillText(spool.prizes[item.group][item.id].number, 20, item.y+6);
 			context.fillText(spool.prizes[item.group][item.id].description, 100, item.y+6);
 			context.fillText(spool.prizes[item.group][item.id].winner, 700, item.y+6);
@@ -96,56 +97,70 @@ if(showing){ // IF only showing grand prize
 			}
 		}
 	}
-}//end checking for grand prize
+} else{
+	context.textAlign="center";
+	context.fillStyle="#ffffff";
+	context.font="75px Arial";
+	context.fillText(errorText, canvas.width/2, canvas.height/2);
+}
 
 
-if(ticker&&ticker.text){
+if(ticker&&ticker.enable){
 	context.fillStyle=ticker.bgColor;
-	context.fillRect(0, canvas.height-tickerHeight, canvas.width, tickerHeight);
+	context.fillRect(0, ((ticker.position=="top")?0:canvas.height-tickerHeight), canvas.width, tickerHeight);
 
 	context.fillStyle=ticker.color;
 	context.font="25px Arial";
-	context.fillText(ticker.text, tickerOffset, canvas.height-tickerHeight);
+	context.fillText(ticker.text||"No Data to Display", tickerOffset, ((ticker.position=="top")?0:canvas.height-tickerHeight));
 }
 statsDraw.end();
 }
 window.requestAnimationFrame(draw);
 
 
-function go(){
-	spoolInterval = setInterval(function(){
-		statsTickSpool.begin();
-		if(list.length==0){
-			if(spool.prizes[1]){
-				list.push({group:1, id:0, odd:true, y:0});
+function go(part){
+	if(part=="spool"){
+		spoolInterval = setInterval(function(){
+			statsTickSpool.begin();
+			if(list.length==0){
+				if(spool.prizes[1]){
+					list.push({group:1, id:0, odd:true, y:0});
+				}
 			}
-		}
-		var flag;
-		for(i=list.length-1;i>=0;i--){
-			var item=list[i];
-			item.y--;
-			if(item.y<-40) list.splice(i, 1);
-			if(i==list.length-1&&item.y<canvas.height){
-				flag=true;
+			var flag;
+			for(i=list.length-1;i>=0;i--){
+				var item=list[i];
+				item.y--;
+				if(item.y<-40) list.splice(i, 1);
+				if(i==list.length-1&&item.y<canvas.height){
+					flag=true;
+				}
 			}
-		}
-		if(flag){
-			addNext(list[list.length-1]);
-		}
-		statsTickSpool.end();
-	}, spool.speed);
-
-	tickerInterval = setInterval(function(){
-		statsTickTicker.begin();
-		tickerOffset--;
-		if(-tickerOffset>context.measureText(ticker.text).width) tickerOffset=canvas.width;
-		statsTickTicker.end();
-	}, ticker.speed);
+			if(flag){
+				addNext(list[list.length-1]);
+			}
+			statsTickSpool.end();
+		}, spool.speed);
+	}
+	if(part=="ticker"){
+		tickerInterval = setInterval(function(){
+			statsTickTicker.begin();
+			tickerOffset--;
+			if(-tickerOffset>context.measureText(ticker.text).width) tickerOffset=canvas.width;
+			statsTickTicker.end();
+		}, ticker.speed);
+	}
 }
-function stop(cb){
-	clearInterval(spoolInterval);
-	clearInterval(tickerInterval);
-	if(cb) cb();
+function stop(part, cb){
+	if(part=="spool"){
+		clearInterval(spoolInterval);
+		spoolInterval=false;
+	}
+	if(part=="ticker"){
+		clearInterval(tickerInterval);
+		tickerInterval=false;
+	}
+	if(cb) cb(part);
 }
 function addNext(item){
 	var exists=getByNumber(spool.prizes[item.group][item.id].number+1);
@@ -198,33 +213,57 @@ websocket.onmessage = function(evt) { websocketMessage(evt); };
 websocket.onerror = function(evt) { websocketError(evt); };
 
 function websocketOpen(evt){
-	console.log("Connected");
-	errorText="Check Controls Page"
+	if(debug) console.log("Connected");
+	errorText="Check Controls Page";
 }
 function websocketClose(evt){
-	console.log("Disconnected");
-	errorText="Run 'start.cmd'"
+	if(debug) console.log("Disconnected");
+	errorText="Run 'start.cmd'";
 }
 function websocketMessage(evt){
 	var com=JSON.parse(evt.data);
 	if(com.type=="update"){
-		var flag;
-		if(!spoolInterval||(com.spool&&com.spool.speed!=spool.speed)||(com.ticker&&com.ticker.speed!=ticker.speed)) flag=true;
+		if(debug) console.log("Got Update");
+		var flag, flag1, flag2;
+		if(spool&&spool.go!=com.spool.go) flag=true;
+		if(ticker&&ticker.go!=com.ticker.go) flag1=true;
+		if(!gotFromServer||(com.spool&&com.spool.speed!=spool.speed)||(com.ticker&&com.ticker.speed!=ticker.speed)) flag2=true;
 		if(com.spool) spool=com.spool;
 		if(com.ticker) ticker=com.ticker;
 		if(com.grand) grand=com.grand;
 		if(com.showing) showing=com.showing;
+		
 		if(flag){
-			stop(function(){
-				go();
+			if(spool.go&&!spoolInterval) go("spool");
+			else if(!spool.go&&spoolInterval) stop("spool");
+		}
+		if(flag1){
+			if(ticker.go&&!tickerInterval) go("ticker");
+			else if(!ticker.go&&tickerInterval) stop("ticker");
+		}
+		
+		if(!flag1&&flag2&&ticker.go){
+			stop("ticker", function(){
+				go("ticker");
 			});
 		}
+		if(!flag&&flag2&&spool.go){
+			stop("spool", function(){
+				go("spool");
+			});
+		}
+		
+		if(!spool.go) errorText="Enable Spool Scrolling"
+		else errorText="Check Controls Page"
+		gotFromServer=true;
 	} else if(com.type=="debug"){
 		if(com.debug){
+			debug=true;
 			$(statsDraw.domElement).show();
 			$(statsTickSpool.domElement).show();
 			$(statsTickTicker.domElement).show();
 		}else{
+			debug=false;
 			$(statsDraw.domElement).hide();
 			$(statsTickSpool.domElement).hide();
 			$(statsTickTicker.domElement).hide();
