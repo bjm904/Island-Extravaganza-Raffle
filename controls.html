@@ -5,6 +5,12 @@
 	<script type="text/javascript" src="files/reconnecting-websocket.js"></script>
 	<script type="text/javascript" src="files/jquery-2.1.1.min.js"></script>
 	<title>Controls</title>
+	<style>
+	.tableLabels{
+		font-weight:bold;
+		background:#333333;
+	}
+	</style>
 </head>
 <body style="background:black;padding:20px;color:white;">
 
@@ -89,14 +95,14 @@ function websocketMessage(evt){
 		
 		$("#prizes").html('');
 		for(g=1;g<spool.prizes.length;g++){
-			$("#prizes").append('<div class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</div><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td>Number</td><td>Description</td><td>Winner</td><td>Collected</td></tr></table>');
+			$("#prizes").append('<span class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</span><input type="button" id="groupDelete'+g+'" class="groupDelete" value="Delete Group"></input><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td class="tableLabels">Number</td><td class="tableLabels">Description</td><td class="tableLabels">Winner</td><td class="tableLabels">Collected</td><td class="tableLabels">Delete</td></tr></table>');
 			for(i=0;i<spool.prizes[g].length;i++){
 				var item=spool.prizes[g][i];
-				$("#prizes"+g).append('<tr id="'+i+'"><td class="prizesNum" style="padding:10px;border-bottom:1px solid white;">'+(item.number||"[Click to Add Number]")+'</td><td class="prizesDescription" style="padding:10px;border-bottom:1px solid white;">'+(item.description||"[Click to Add Description]")+'</td><td class="prizesWinner" style="padding:10px;border-bottom:1px solid white;">'+(item.winner||"[Click to Add Winner]")+'</td><td class="prizesCollected" style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="checkbox" class="prizesCollectedTick"></input></td></tr>');
+				$("#prizes"+g).append('<tr id="itemRow'+i+'"><td class="prizesNum" style="padding:10px;border-bottom:1px solid white;">'+(item.number||"[Click to Add Number]")+'</td><td class="prizesDescription" style="padding:10px;border-bottom:1px solid white;">'+(item.description||"[Click to Add Description]")+'</td><td class="prizesWinner" style="padding:10px;border-bottom:1px solid white;">'+(item.winner||"[Click to Add Winner]")+'</td><td class="prizesCollected" style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="checkbox" class="prizesCollectedTick" '+((item.collected)?"checked":"")+'></input></td><td style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="button" class="itemDelete" value="x"></input></td></tr>');
 			}
-			$("#prizes"+g).append('<tr><td><input type="button" value="Add Item"></input></td><td></td><td></td><td></td></tr>');
+			$("#prizes"+g).append('<tr><td><input type="button" class="addItem" value="Add Item"></input></td><td></td><td></td><td></td></tr>');
 		}
-		
+		$("#prizes").append('<input type="button" class="addGroup" value="Add Group"></input>');
 		
 	} else if(com.type=="debug"){
 		debug=com.debug;
@@ -175,11 +181,116 @@ $(document).on("keypress", ".editTitle", function(e){
 $(document).on("blur", ".editTitle", function(){
 	var group=$(this).attr("id").replace("editTitle", "");
 	spool.titles[group]=$(this).val();
-	$(this).parent().html(spool.titles[group]||"[Click to Add Title]");
 	sendUpdate();
 });
 
 
+$(document).on("click", ".groupDelete", function(){
+	var group=$(this).attr("id").replace("groupDelete", "");
+	console.log(group);
+	if(confirm("Are you sure you want to delete the group:\n"+spool.titles[group]+"\nand "+spool.prizes[group].length+" items?")){
+		spool.prizes.splice(group, 1);
+		spool.titles.splice(group, 1);
+		sendUpdate();
+	}
+});
+
+
+$(document).on("click", ".prizesNum", function(){
+	if($(this).has("input").length==0){
+		var group=$(this).closest("table").attr("id").replace("prizes", "");
+		var num=$(this).parent().attr("id").replace("itemRow", "");
+		$(this).html('<input type="text" class="editNum" id="editNum'+group+'-'+num+'" value="'+spool.prizes[group][num].number+'"></input>');
+		$("#editNum"+group+"-"+num).focus();
+	}
+});
+$(document).on("keypress", ".editNum", function(e){
+	if(e.keyCode==13) $(this).trigger("blur");
+});
+$(document).on("blur", ".editNum", function(){
+	var id=$(this).attr("id").replace("editNum", "");
+	var group=id.split("-")[0];
+	var num=id.split("-")[1];
+	spool.prizes[group][num].number=$(this).val();
+	sendUpdate();
+});
+
+
+$(document).on("click", ".prizesDescription", function(){
+	if($(this).has("input").length==0){
+		var group=$(this).closest("table").attr("id").replace("prizes", "");
+		var num=$(this).parent().attr("id").replace("itemRow", "");
+		$(this).html('<input type="text" class="editDec" id="editDec'+group+'-'+num+'" value="'+spool.prizes[group][num].description+'"></input>');
+		$("#editDec"+group+"-"+num).focus();
+	}
+});
+$(document).on("keypress", ".editDec", function(e){
+	if(e.keyCode==13) $(this).trigger("blur");
+});
+$(document).on("blur", ".editDec", function(){
+	var id=$(this).attr("id").replace("editDec", "");
+	var group=id.split("-")[0];
+	var num=id.split("-")[1];
+	spool.prizes[group][num].description=$(this).val();
+	sendUpdate();
+});
+
+
+$(document).on("click", ".prizesWinner", function(){
+	if($(this).has("input").length==0){
+		var group=$(this).closest("table").attr("id").replace("prizes", "");
+		var num=$(this).parent().attr("id").replace("itemRow", "");
+		$(this).html('<input type="text" class="editWinner" id="editWinner'+group+'-'+num+'" value="'+spool.prizes[group][num].winner+'"></input>');
+		$("#editWinner"+group+"-"+num).focus();
+	}
+});
+$(document).on("keypress", ".editWinner", function(e){
+	if(e.keyCode==13) $(this).trigger("blur");
+});
+$(document).on("blur", ".editWinner", function(){
+	var id=$(this).attr("id").replace("editWinner", "");
+	var group=id.split("-")[0];
+	var num=id.split("-")[1];
+	spool.prizes[group][num].winner=$(this).val();
+	sendUpdate();
+});
+
+
+$(document).on("change", ".prizesCollectedTick", function(){
+	var group=$(this).closest("table").attr("id").replace("prizes", "");
+	var num=$(this).parent().parent().attr("id").replace("itemRow", "");
+	spool.prizes[group][num].collected=$(this).prop("checked");
+	sendUpdate();
+});
+
+
+$(document).on("click", ".itemDelete", function(){
+	var group=$(this).closest("table").attr("id").replace("prizes", "");
+	var num=$(this).parent().parent().attr("id").replace("itemRow", "");
+	var item=spool.prizes[group][num];
+	if(spool.prizes[group].length<2) alert("You must leave at least one item per group");
+	else{
+		if(confirm("Are you sure you want to delete:\n"+item.number+"\n"+item.description+"\n"+item.winner)){
+			spool.prizes[group].splice(num, 1);
+			sendUpdate();
+		}
+	}
+});
+
+$(document).on("click", ".addItem", function(){
+	var group=$(this).closest("table").attr("id").replace("prizes", "");
+	var number="";
+	if(spool.prizes[group][spool.prizes[group].length-1]) number=Number(spool.prizes[group][spool.prizes[group].length-1].number)+1;
+	spool.prizes[group].push({number:number, description:"", winner:"", collected:false});
+	sendUpdate();
+});
+
+
+$(document).on("click", ".addGroup", function(){
+	spool.prizes.push([{number:"", description:"", winner:"", collected:false}]);
+	spool.titles.push("");
+	sendUpdate();
+});
 }
 </script>
 <h1 style="width:100%;text-align:center;">Controls</h1>

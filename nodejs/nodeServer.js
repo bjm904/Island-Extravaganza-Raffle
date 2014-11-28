@@ -23,18 +23,19 @@ var wss = new WebSocketServer({port: 6458});
 
 var clients=[];
 
-var showing=false;
+var showing=[true];
 var ticker={
 enable:true,
 go:true,
-speed:40,
+speed:70,
+position:"bottom",
 text:"",
 color:"#ffffff",
 bgColor:"#000000"
 }
 var spool={
 go:true,
-speed:40,
+speed:70,
 titles:["","Raffle 1","Raffle 2"],
 prizes:[[
 	{
