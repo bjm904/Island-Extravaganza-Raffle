@@ -73,7 +73,7 @@ color:"#ffffff",
 bgColor1:"#282828",
 bgColor2:"#222222"
 };
-var grand=["Grand Prize","Trip for two","Jonathan Rivas"];
+var grand=["Grand Prize","Trip For Two","Jhon Doe"];
 
 var raw;
 
