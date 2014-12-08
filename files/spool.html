@@ -7,13 +7,14 @@
 		<script type="text/javascript" src="jquery-2.1.1.min.js"></script>
 	<title>Projector</title>
 </head>
-<body style="background:black;padding:0px;">
+<body style="background:black;padding:0px;margin:0px;overflow:hidden;">
 
-<canvas width="1014" height="750" id="canvas" style="padding:0px;"></canvas>
+<canvas id="canvas" style="padding:0px;margin:0px;"></canvas>
 <script type="text/javascript">
 if(browser != true){
 document.write("Please use Google Chrome");
 } else{
+
 
 var imgcheck=new Image();
 imgcheck.src="check.png";
@@ -21,8 +22,9 @@ imgcheck.src="check.png";
 
 var canvas=document.getElementById("canvas");
 var context=canvas.getContext("2d");
-context.textBaseline="top";
-var tickerHeight=30;
+canvas.width=$(window).width()
+canvas.height=$(window).height();
+context.textBaseline="middle";
 var tickerOffset=0;
 var list=[];
 var spoolInterval;
@@ -63,6 +65,7 @@ statsDraw.begin();
 window.requestAnimationFrame(draw);
 context.clearRect(0, 0, canvas.width, canvas.height);
 
+
 if(showing&&showing[0]=="grand"){ // IF only showing grand prize
 	context.textAlign="center";
 	context.fillStyle=spool.color;
@@ -72,6 +75,7 @@ if(showing&&showing[0]=="grand"){ // IF only showing grand prize
 		context.fillText(grand[i], canvas.width/2, height+(i*100));
 	}
 } else if(showing&&showing[0]==true){
+	var fontSize=spool.padding*0.63;
 	if(list.length==0){
 		context.textAlign="center";
 		context.fillStyle="#ffffff";
@@ -81,19 +85,21 @@ if(showing&&showing[0]=="grand"){ // IF only showing grand prize
 	for(i=0;i<list.length;i++){
 		var item=list[i];
 		context.fillStyle=(item.odd)? spool.bgColor1 : spool.bgColor2;
-		context.fillRect(0,item.y,1014,40);
+		context.fillRect(0,item.y,canvas.width,spool.padding);
 		context.fillStyle=spool.color;
-		context.font="25px Arial";
+		context.font=fontSize+"px Arial";
 		if("title" in item){
 			context.textAlign="center";
-			context.fillText(item.title, canvas.width/2, item.y+6);
+			context.fillText(item.title, canvas.width/2, item.y+spool.padding/2);
 		} else{
 			context.textAlign="start";
-			context.fillText(spool.prizes[item.group][item.id].number, 20, item.y+6);
-			context.fillText(spool.prizes[item.group][item.id].description, 100, item.y+6);
-			context.fillText(spool.prizes[item.group][item.id].winner, 700, item.y+6);
+			context.textAlign="left";
+			context.fillText(spool.prizes[item.group][item.id].number, 20, item.y+spool.padding/2);
+			context.fillText(spool.prizes[item.group][item.id].description, 40+context.measureText(spool.prizes[item.group][item.id].number).width, item.y+spool.padding/2);
+			context.textAlign="right";
+			context.fillText(spool.prizes[item.group][item.id].winner, canvas.width-((spool.padding*0.4)+40), item.y+spool.padding/2);
 			if(spool.prizes[item.group][item.id].collected){
-				context.drawImage(imgcheck, 985, item.y+15, 15, 15);
+				context.drawImage(imgcheck, canvas.width-((spool.padding*0.4)+20), item.y+(spool.padding-spool.padding*0.4)/2, spool.padding*0.4, spool.padding*0.4);
 			}
 		}
 	}
@@ -106,12 +112,13 @@ if(showing&&showing[0]=="grand"){ // IF only showing grand prize
 
 
 if(ticker&&ticker.enable){
+	var tickerHeight=spool.padding*0.7;
 	context.fillStyle=ticker.bgColor;
 	context.fillRect(0, ((ticker.position=="top")?0:canvas.height-tickerHeight), canvas.width, tickerHeight);
 
 	context.fillStyle=ticker.color;
-	context.font="25px Arial";
-	context.fillText(ticker.text||"No Data to Display", tickerOffset, ((ticker.position=="top")?0:canvas.height-tickerHeight));
+	context.font=fontSize+"px Arial";
+	context.fillText(ticker.text||"No Data to Display", tickerOffset, ((ticker.position=="top")?tickerHeight/2:canvas.height-tickerHeight/2));
 }
 statsDraw.end();
 }
@@ -131,7 +138,7 @@ function go(part){
 			for(i=list.length-1;i>=0;i--){
 				var item=list[i];
 				item.y--;
-				if(item.y<-40) list.splice(i, 1);
+				if(item.y<-spool.padding) list.splice(i, 1);
 				if(i==list.length-1&&item.y<canvas.height){
 					flag=true;
 				}
@@ -166,30 +173,30 @@ function addNext(item){
 	var exists=getByNumber(spool.prizes[item.group][item.id].number+1);
 	var id;
 	if(exists){
-		list.push({group:item.group, id:exists, odd:!item.odd, y:item.y+40});
+		list.push({group:item.group, id:exists, odd:!item.odd, y:item.y+spool.padding});
 	} else{
 		var odd=!item.odd;
-		list.push({group:0, id:0, odd:odd, y:item.y+40});
+		list.push({group:0, id:0, odd:odd, y:item.y+spool.padding});
 		odd=!odd;
 		if(spool.prizes[item.group+1]){
-			list.push({title:spool.titles[item.group+1], y:item.y+80, odd:odd});
+			list.push({title:spool.titles[item.group+1], y:item.y+spool.padding*2, odd:odd});
 			odd=!odd;
-			list.push({group:item.group+1, id:0, odd:odd, y:item.y+120});
+			list.push({group:item.group+1, id:0, odd:odd, y:item.y+spool.padding*3});
 			odd=!odd;
 		} else{
-			var addY=80;
+			var addY=spool.padding*2;
 			for(i=0;i<grand.length;i++){
 				list.push({title:grand[i], y:item.y+addY, odd:odd});
-				addY+=40;
+				addY+=spool.padding;
 				odd=!odd;
 			}
 			if(grand.length>0){
 				list.push({group:0, id:0, odd:odd, y:item.y+addY});
-				addY+=40;
+				addY+=spool.padding;
 				odd=!odd;
 			}
 			list.push({title:spool.titles[1], y:item.y+addY, odd:odd});
-			addY+=40;
+			addY+=spool.padding;
 			odd=!odd;
 			list.push({group:1, id:0, odd:!item.odd, y:item.y+addY, odd:odd});
 		}

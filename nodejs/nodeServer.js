@@ -36,6 +36,7 @@ bgColor:"#000000"
 var spool={
 go:true,
 speed:70,
+padding:40,
 titles:["","Raffle 1","Raffle 2"],
 prizes:[[
 	{
