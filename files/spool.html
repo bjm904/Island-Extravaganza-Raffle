@@ -92,12 +92,10 @@ if(showing&&showing[0]=="grand"){ // IF only showing grand prize
 			context.textAlign="center";
 			context.fillText(item.title, canvas.width/2, item.y+spool.padding/2);
 		} else{
-			context.textAlign="start";
 			context.textAlign="left";
 			context.fillText(spool.prizes[item.group][item.id].number, 20, item.y+spool.padding/2);
 			context.fillText(spool.prizes[item.group][item.id].description, 40+context.measureText(spool.prizes[item.group][item.id].number).width, item.y+spool.padding/2);
-			context.textAlign="right";
-			context.fillText(spool.prizes[item.group][item.id].winner, canvas.width-((spool.padding*0.4)+40), item.y+spool.padding/2);
+			context.fillText(spool.prizes[item.group][item.id].winner, canvas.width-(((spool.padding*0.4)+40)+context.measureText("Bryce Jonathan R Rivas").width), item.y+spool.padding/2);
 			if(spool.prizes[item.group][item.id].collected){
 				context.drawImage(imgcheck, canvas.width-((spool.padding*0.4)+20), item.y+(spool.padding-spool.padding*0.4)/2, spool.padding*0.4, spool.padding*0.4);
 			}
