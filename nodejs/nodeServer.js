@@ -37,6 +37,7 @@ var spool={
 go:true,
 speed:70,
 padding:40,
+showing:[0,1],
 titles:["","Raffle 1","Raffle 2"],
 prizes:[[
 	{

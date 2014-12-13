@@ -28,7 +28,7 @@ var grand;
 var showing;
 
 
-var websocket = new ReconnectingWebSocket("ws://localhost:6458");
+var websocket = new ReconnectingWebSocket("ws://celestia:6458");
 websocket.onopen = function(evt) { websocketOpen(evt); };
 websocket.onclose = function(evt) { websocketClose(evt); };
 websocket.onmessage = function(evt) { websocketMessage(evt); };
@@ -73,6 +73,7 @@ function websocketMessage(evt){
 		if(spool.go) $("#spoolGo").val("Scrolling").css("color", "black");
 		else $("#spoolGo").val("Paused").css("color", "red");
 		$("#spoolSpeed").val(spool.speed);
+		
 		$("#spoolColor").val(spool.color);
 		$("#spoolBgColor1").val(spool.bgColor1);
 		$("#spoolBgColor2").val(spool.bgColor2);
@@ -95,7 +96,7 @@ function websocketMessage(evt){
 		
 		$("#prizes").html('');
 		for(g=1;g<spool.prizes.length;g++){
-			$("#prizes").append('<span class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</span><input type="button" id="groupDelete'+g+'" class="groupDelete" value="Delete Group"></input><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td class="tableLabels">Number</td><td class="tableLabels">Description</td><td class="tableLabels">Winner</td><td class="tableLabels">Collected</td><td class="tableLabels">Delete</td></tr></table>');
+			$("#prizes").append('<span class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</span><input type="checkbox" id="showing'+g+'" class="showing" '+((spool.showing.indexOf(g)>-1)?"checked":"")+'></input><input type="button" id="groupDelete'+g+'" class="groupDelete" value="Delete Group"></input><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td class="tableLabels">Number</td><td class="tableLabels">Description</td><td class="tableLabels">Winner</td><td class="tableLabels">Collected</td><td class="tableLabels">Delete</td></tr></table>');
 			for(i=0;i<spool.prizes[g].length;i++){
 				var item=spool.prizes[g][i];
 				$("#prizes"+g).append('<tr id="itemRow'+i+'"><td class="prizesNum" style="padding:10px;border-bottom:1px solid white;">'+(item.number||"[Click to Add Number]")+'</td><td class="prizesDescription" style="padding:10px;border-bottom:1px solid white;">'+(item.description||"[Click to Add Description]")+'</td><td class="prizesWinner" style="padding:10px;border-bottom:1px solid white;">'+(item.winner||"[Click to Add Winner]")+'</td><td class="prizesCollected" style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="checkbox" class="prizesCollectedTick" '+((item.collected)?"checked":"")+'></input></td><td style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="button" class="itemDelete" value="x"></input></td></tr>');
@@ -121,9 +122,15 @@ function sendUpdate(){
 		else showing[0]=false;
 		
 		spool.speed=$("#spoolSpeed").val();
+		spool.showing=$("#spoolShowing").val();
 		spool.color=$("#spoolColor").val();
 		spool.bgColor1=$("#spoolBgColor1").val();
 		spool.bgColor2=$("#spoolBgColor2").val();
+		
+		spool.showing=[];
+		$(".showing").each(function(){
+			if($(this).prop("checked")) spool.showing.push(Number($(this).attr("id").replace("showing","")));
+		});
 		
 		ticker.enable=$("#tickerEnable").prop("checked");
 		ticker.position=$("input[name=tickerPosition]:checked").val();
@@ -145,6 +152,9 @@ $(document).on("click", "#debug", function(){
 	toggleDebug(!debug);
 });
 $(document).on("change", ".setting", function(){
+	sendUpdate();
+});
+$(document).on("change", ".showing", function(){
 	sendUpdate();
 });
 
@@ -323,6 +333,7 @@ Ticker Background:<input type="color" id="tickerBgColor" class="setting"></input
 
 <div id="spoolSettings" style="display:none;">
 <h1>Spool</h1>
+<label>Spool Showing:<input type="text" id="spoolShowing" class="setting"></input></label><br>
 Scroll:<input type="button" id="spoolGo" value=""></input><br>
 Spool Speed:<select id="spoolSpeed" value="20" class="setting"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
 <label>Spool Text Color:<input type="color" id="spoolColor" class="setting"></input></label><br>

@@ -128,7 +128,7 @@ function go(part){
 		spoolInterval = setInterval(function(){
 			statsTickSpool.begin();
 			if(list.length==0){
-				if(spool.prizes[1]){
+				if(spool.prizes[spool.showing[0]]){
 					list.push({group:1, id:0, odd:true, y:0});
 				}
 			}
@@ -168,7 +168,7 @@ function stop(part, cb){
 	if(cb) cb(part);
 }
 function addNext(item){
-	var exists=getByNumber(spool.prizes[item.group][item.id].number+1);
+	var exists=getByNumber(Number(spool.prizes[item.group][item.id].number)+1);
 	var id;
 	if(exists){
 		list.push({group:item.group, id:exists, odd:!item.odd, y:item.y+spool.padding});
@@ -176,7 +176,7 @@ function addNext(item){
 		var odd=!item.odd;
 		list.push({group:0, id:0, odd:odd, y:item.y+spool.padding});
 		odd=!odd;
-		if(spool.prizes[item.group+1]){
+		if(spool.prizes[spool.showing[spool.showing.indexOf(item.group)+1]]){
 			list.push({title:spool.titles[item.group+1], y:item.y+spool.padding*2, odd:odd});
 			odd=!odd;
 			list.push({group:item.group+1, id:0, odd:odd, y:item.y+spool.padding*3});
