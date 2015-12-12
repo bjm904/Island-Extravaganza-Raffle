@@ -28,7 +28,7 @@ var grand;
 var showing;
 
 
-var websocket = new ReconnectingWebSocket("ws://celestia:6458");
+var websocket = new ReconnectingWebSocket("ws://localhost:6458");
 websocket.onopen = function(evt) { websocketOpen(evt); };
 websocket.onclose = function(evt) { websocketClose(evt); };
 websocket.onmessage = function(evt) { websocketMessage(evt); };
