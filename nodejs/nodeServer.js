@@ -86,7 +86,7 @@ fs.exists('../database', function(exists){
 		saveDb();
 		log("New database created");
 	} else{
-		var raw = JSON.parse(fs.readFileSync('../database', 'utf8'));
+		var raw = JSON.parse(fs.readFileSync('database', 'utf8'));
 		if(raw.spool&&raw.ticker&&raw.grand){
 			spool=raw.spool;
 			ticker=raw.ticker;
