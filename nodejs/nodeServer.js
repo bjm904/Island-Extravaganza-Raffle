@@ -94,7 +94,7 @@ fs.exists('database', function(exists){
 			showing=raw.showing;
 			spool.go=true;
 			ticker.go=true;
-			log("Loaded from Database");
+			log("Loaded from database");
 		} else{
 			saveDb();
 		}

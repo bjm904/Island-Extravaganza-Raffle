@@ -83,13 +83,13 @@ if(showing&&showing[0]=="grand"){ // IF only showing grand prize
 	context.textAlign="center";
 	context.font="105px Playball";
 	var height=(grand.length*100)/2;
-	
+
 	//context.globalAlpha=perc*1;
 	context.fillStyle=spool.color;
 	for(i=0;i<grand.length;i++){
 		context.fillText(grand[i], canvas.width/2, height+(i*100));
 	}
-	
+
 	context.globalAlpha=1-perc*1;
 	context.fillStyle="gold";
 	for(i=grand.length-1;i<grand.length;i++){
@@ -258,7 +258,7 @@ function websocketMessage(evt){
 		if(com.ticker) ticker=com.ticker;
 		if(com.grand) grand=com.grand;
 		if(com.showing) showing=com.showing;
-		
+
 		if(flag){
 			if(spool.go&&!spoolInterval) go("spool");
 			else if(!spool.go&&spoolInterval) stop("spool");
@@ -267,7 +267,7 @@ function websocketMessage(evt){
 			if(ticker.go&&!tickerInterval) go("ticker");
 			else if(!ticker.go&&tickerInterval) stop("ticker");
 		}
-		
+
 		if(!flag1&&flag2&&ticker.go){
 			stop("ticker", function(){
 				go("ticker");
@@ -278,7 +278,7 @@ function websocketMessage(evt){
 				go("spool");
 			});
 		}
-		
+
 		if(!spool.go) errorText="Enable Spool Scrolling"
 		else errorText="Check Controls Page"
 		gotFromServer=true;

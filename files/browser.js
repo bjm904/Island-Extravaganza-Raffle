@@ -117,5 +117,5 @@ var BrowserDetect = {
 BrowserDetect.init();
 var browser = false;
 if (BrowserDetect.browser == "Chrome"){
-	browser = true; 
+	browser = true;
 }

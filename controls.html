@@ -1,362 +1,350 @@
 <html>
-<head>
-	<meta http-equiv="content-type" content="text/html;charset=utf-8" />
-	<script type="text/javascript" src="files/browser.js"></script>
-	<script type="text/javascript" src="files/reconnecting-websocket.js"></script>
-	<script type="text/javascript" src="files/jquery-2.1.1.min.js"></script>
-	<title>Controls</title>
-	<style>
-	.tableLabels{
-		font-weight:bold;
-		background:#333333;
-	}
-	</style>
-</head>
-<body style="background:black;padding:20px;color:white;">
-
-<script type="text/javascript">
-if(browser != true){
-document.write("Please use Google Chrome");
-} else{
-
-//"Thank you to all our donors and volunteers: (List of doners here)"
-var gotFromServer;
-var debug;
-var spool;
-var ticker;
-var grand;
-var showing;
-
-
-var websocket = new ReconnectingWebSocket("ws://localhost:6458");
-websocket.onopen = function(evt) { websocketOpen(evt); };
-websocket.onclose = function(evt) { websocketClose(evt); };
-websocket.onmessage = function(evt) { websocketMessage(evt); };
-websocket.onerror = function(evt) { websocketError(evt); };
-
-function websocketOpen(evt){
-	if(debug) console.log("Connected");
-	$("#settings").show();
-	$("#runCmd").html("Please run start.cmd");
-	$("#runCmd").hide();
-}
-function websocketClose(evt){
-	if(debug) console.log("Disconnected");
-	$("#settings").hide();
-	$("#runCmd").html("Please run start.cmd");
-	$("#runCmd").show();
-}
-function websocketMessage(evt){
-	if(debug) console.log("Got Update");
-	var com=JSON.parse(evt.data);
-	if(com.type=="update"){
-		gotFromServer=true;
-		if(com.spool) spool=com.spool;
-		if(com.ticker) ticker=com.ticker;
-		if(com.grand) grand=com.grand;
-		if(com.showing) showing=com.showing;
-		
-		if(showing&&showing[0]==true){
-			$("#mainSelectSpool").prop("checked", true);
-			$("#spoolSettings").show();
-			$("#slideshowSettings").hide();
-		} else if(showing&&showing[0]=="grand"){
-			$("#mainSelectGrand").prop("checked", true);
-			$("#spoolSettings").show();
-			$("#slideshowSettings").hide();
-		} else{
-			$("#mainSelectSlideshow").prop("checked", true);
-			$("#slideshowSettings").show();
-			$("#spoolSettings").hide();
+	<head>
+		<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+		<script type="text/javascript" src="files/browser.js"></script>
+		<script type="text/javascript" src="files/reconnecting-websocket.js"></script>
+		<script type="text/javascript" src="files/jquery-2.1.1.min.js"></script>
+		<title>Control Page</title>
+		<style>
+		.tableLabels{
+			font-weight:bold;
+			background:#333333;
 		}
-		
-		if(spool.go) $("#spoolGo").val("Scrolling").css("color", "black");
-		else $("#spoolGo").val("Paused").css("color", "red");
-		$("#spoolSpeed").val(spool.speed);
-		
-		$("#spoolColor").val(spool.color);
-		$("#spoolBgColor1").val(spool.bgColor1);
-		$("#spoolBgColor2").val(spool.bgColor2);
-		
-		$("#tickerEnable").prop("checked", ticker.enable);
-		if(ticker.go) $("#tickerGo").val("Scrolling").css("color", "black");
-		else $("#tickerGo").val("Paused").css("color", "red");
-		$("#tickerPosition"+ticker.position).prop("checked", true);
-		$("#tickerSpeed").val(ticker.speed);
-		$("#tickerText").val(ticker.text);
-		$("#tickerColor").val(ticker.color);
-		$("#tickerBgColor").val(ticker.bgColor);
-		
-		var grandText="";
-		for(i=0;i<grand.length;i++){
-			grandText+=grand[i]+"\n";
-		}
-		grandText=grandText.substring(0, grandText.length-1);
-		$("#grand").val(grandText);
-		
-		$("#prizes").html('');
-		for(g=1;g<spool.prizes.length;g++){
-			$("#prizes").append('<span class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</span><input type="checkbox" id="showing'+g+'" class="showing" '+((spool.showing.indexOf(g)>-1)?"checked":"")+'></input><input type="button" id="groupDelete'+g+'" class="groupDelete" value="Delete Group"></input><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td class="tableLabels">Number</td><td class="tableLabels">Description</td><td class="tableLabels">Winner</td><td class="tableLabels">Collected</td><td class="tableLabels">Delete</td></tr></table>');
-			for(i=0;i<spool.prizes[g].length;i++){
-				var item=spool.prizes[g][i];
-				$("#prizes"+g).append('<tr id="itemRow'+i+'"><td class="prizesNum" style="padding:10px;border-bottom:1px solid white;">'+(item.number||"[Click to Add Number]")+'</td><td class="prizesDescription" style="padding:10px;border-bottom:1px solid white;">'+(item.description||"[Click to Add Description]")+'</td><td class="prizesWinner" style="padding:10px;border-bottom:1px solid white;">'+(item.winner||"[Click to Add Winner]")+'</td><td class="prizesCollected" style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="checkbox" class="prizesCollectedTick" '+((item.collected)?"checked":"")+'></input></td><td style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="button" class="itemDelete" value="x"></input></td></tr>');
-			}
-			$("#prizes"+g).append('<tr><td><input type="button" class="addItem" value="Add Item"></input></td><td></td><td></td><td></td></tr>');
-		}
-		$("#prizes").append('<input type="button" class="addGroup" value="Add Group"></input>');
-		
-	} else if(com.type=="debug"){
-		debug=com.debug;
-		$("#debug").val((debug)?"On":"Off");
-	}
-}
-function websocketError(evt){
-	console.log("Server Error");
-}
-function sendUpdate(){
-	if(gotFromServer){
-		
-		showing=showing||[];
-		if($("input[name=mainSelect]:checked").val()=="spool") showing[0]=true;
-		else if($("input[name=mainSelect]:checked").val()=="grand") showing[0]="grand";
-		else showing[0]=false;
-		
-		spool.speed=$("#spoolSpeed").val();
-		spool.showing=$("#spoolShowing").val();
-		spool.color=$("#spoolColor").val();
-		spool.bgColor1=$("#spoolBgColor1").val();
-		spool.bgColor2=$("#spoolBgColor2").val();
-		
-		spool.showing=[];
-		$(".showing").each(function(){
-			if($(this).prop("checked")) spool.showing.push(Number($(this).attr("id").replace("showing","")));
-		});
-		
-		ticker.enable=$("#tickerEnable").prop("checked");
-		ticker.position=$("input[name=tickerPosition]:checked").val();
-		ticker.speed=$("#tickerSpeed").val();
-		ticker.text=$("#tickerText").val();
-		ticker.color=$("#tickerColor").val();
-		ticker.bgColor=$("#tickerBgColor").val();
+		</style>
+	</head>
+	<body style="background:black;padding:20px;color:white;">
 
-		grand=$('#grand').val().split(/\n/);
-		
-		websocket.send(JSON.stringify({type:"update", spool:spool, ticker:ticker, grand:grand, showing:showing}));
-	}
-}
-function toggleDebug(bool){
-	websocket.send(JSON.stringify({type:"debug", debug:bool}));
-}
-
-$(document).on("click", "#debug", function(){
-	toggleDebug(!debug);
-});
-$(document).on("change", ".setting", function(){
-	sendUpdate();
-});
-$(document).on("change", ".showing", function(){
-	sendUpdate();
-});
-
-$(document).on("click", "#tickerGo", function(){
-	ticker.go=!ticker.go;
-	sendUpdate();
-});
-$(document).on("click", "#spoolGo", function(){
-	spool.go=!spool.go;
-	sendUpdate();
-});
-
-$(document).on("change", ".mainSelect", function(){
-	if($("input[name=mainSelect]:checked").val()=="spool"||$("input[name=mainSelect]:checked").val()=="grand"){
-		$("#spoolSettings").show();
-		$("#slideshowSettings").hide();
+	<script type="text/javascript">
+	if(browser != true){
+		document.write("Please use Google Chrome");
 	} else{
-		$("#slideshowSettings").show();
-		$("#spoolSettings").hide();
+	var gotFromServer;
+	var debug;
+	var spool;
+	var ticker;
+	var grand;
+	var showing;
+
+
+	var websocket = new ReconnectingWebSocket("ws://localhost:6458");
+	websocket.onopen = function(evt) { websocketOpen(evt); };
+	websocket.onclose = function(evt) { websocketClose(evt); };
+	websocket.onmessage = function(evt) { websocketMessage(evt); };
+	websocket.onerror = function(evt) { websocketError(evt); };
+
+	function websocketOpen(evt){
+		if(debug) console.log("Connected");
+		$("#settings").show();
+		$("#runCmd").html("Please run start.cmd");
+		$("#runCmd").hide();
 	}
-});
-
-$(document).on("click", ".prizesTitle", function(){
-	if($(this).has("input").length==0){
-		var group=$(this).attr("id").replace("prizesTitle", "");
-		$(this).html('<input type="text" class="editTitle" id="editTitle'+group+'" value="'+spool.titles[group]+'"></input>');
-		$("#editTitle"+group).focus();
+	function websocketClose(evt){
+		if(debug) console.log("Disconnected");
+		$("#settings").hide();
+		$("#runCmd").html("Please run start.cmd");
+		$("#runCmd").show();
 	}
-});
+	function websocketMessage(evt){
+		if(debug) console.log("Got Update");
+		var com=JSON.parse(evt.data);
+		if(com.type=="update"){
+			gotFromServer=true;
+			if(com.spool) spool=com.spool;
+			if(com.ticker) ticker=com.ticker;
+			if(com.grand) grand=com.grand;
+			if(com.showing) showing=com.showing;
 
-$(document).on("keypress", ".editTitle", function(e){
-	if(e.keyCode==13) $(this).trigger("blur");
-});
-$(document).on("blur", ".editTitle", function(){
-	var group=$(this).attr("id").replace("editTitle", "");
-	spool.titles[group]=$(this).val();
-	sendUpdate();
-});
+			if(showing&&showing[0]==true){
+				$("#mainSelectSpool").prop("checked", true);
+				$("#spoolSettings").show();
+			} else if(showing&&showing[0]=="grand"){
+				$("#mainSelectGrand").prop("checked", true);
+				$("#spoolSettings").show();
+			}
 
+			if(spool.go) $("#spoolGo").val("Scrolling").css("color", "black");
+			else $("#spoolGo").val("Paused").css("color", "red");
+			$("#spoolSpeed").val(spool.speed);
 
-$(document).on("click", ".groupDelete", function(){
-	var group=$(this).attr("id").replace("groupDelete", "");
-	console.log(group);
-	if(confirm("Are you sure you want to delete the group:\n"+spool.titles[group]+"\nand "+spool.prizes[group].length+" items?")){
-		spool.prizes.splice(group, 1);
-		spool.titles.splice(group, 1);
+			$("#spoolColor").val(spool.color);
+			$("#spoolBgColor1").val(spool.bgColor1);
+			$("#spoolBgColor2").val(spool.bgColor2);
+
+			$("#tickerEnable").prop("checked", ticker.enable);
+			if(ticker.go) $("#tickerGo").val("Scrolling").css("color", "black");
+			else $("#tickerGo").val("Paused").css("color", "red");
+			$("#tickerPosition"+ticker.position).prop("checked", true);
+			$("#tickerSpeed").val(ticker.speed);
+			$("#tickerText").val(ticker.text);
+			$("#tickerColor").val(ticker.color);
+			$("#tickerBgColor").val(ticker.bgColor);
+
+			var grandText="";
+			for(i=0;i<grand.length;i++){
+				grandText+=grand[i]+"\n";
+			}
+			grandText=grandText.substring(0, grandText.length-1);
+			$("#grand").val(grandText);
+
+			$("#prizes").html('');
+			for(g=1;g<spool.prizes.length;g++){
+				$("#prizes").append('<span class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</span><input type="checkbox" id="showing'+g+'" class="showing" '+((spool.showing.indexOf(g)>-1)?"checked":"")+'></input><input type="button" id="groupDelete'+g+'" class="groupDelete" value="Delete Group"></input><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td class="tableLabels">Number</td><td class="tableLabels">Description</td><td class="tableLabels">Winner</td><td class="tableLabels">Collected</td><td class="tableLabels">Delete</td></tr></table>');
+				for(i=0;i<spool.prizes[g].length;i++){
+					var item=spool.prizes[g][i];
+					$("#prizes"+g).append('<tr id="itemRow'+i+'"><td class="prizesNum" style="padding:10px;border-bottom:1px solid white;">'+(item.number||"[Click to Add Number]")+'</td><td class="prizesDescription" style="padding:10px;border-bottom:1px solid white;">'+(item.description||"[Click to Add Description]")+'</td><td class="prizesWinner" style="padding:10px;border-bottom:1px solid white;">'+(item.winner||"[Click to Add Winner]")+'</td><td class="prizesCollected" style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="checkbox" class="prizesCollectedTick" '+((item.collected)?"checked":"")+'></input></td><td style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="button" class="itemDelete" value="x"></input></td></tr>');
+				}
+				$("#prizes"+g).append('<tr><td><input type="button" class="addItem" value="Add Item"></input></td><td></td><td></td><td></td></tr>');
+			}
+			$("#prizes").append('<input type="button" class="addGroup" value="Add Group"></input>');
+
+		} else if(com.type=="debug"){
+			debug=com.debug;
+			$("#debug").val((debug)?"On":"Off");
+		}
+	}
+	function websocketError(evt){
+		console.log("Server Error");
+	}
+	function sendUpdate(){
+		if(gotFromServer){
+
+			showing=showing||[];
+			if($("input[name=mainSelect]:checked").val()=="spool") showing[0]=true;
+			else if($("input[name=mainSelect]:checked").val()=="grand") showing[0]="grand";
+			else showing[0]=false;
+
+			spool.speed=$("#spoolSpeed").val();
+			spool.color=$("#spoolColor").val();
+			spool.bgColor1=$("#spoolBgColor1").val();
+			spool.bgColor2=$("#spoolBgColor2").val();
+
+			spool.showing=[];
+			$(".showing").each(function(){
+				if($(this).prop("checked")) spool.showing.push(Number($(this).attr("id").replace("showing","")));
+			});
+
+			ticker.enable=$("#tickerEnable").prop("checked");
+			ticker.position=$("input[name=tickerPosition]:checked").val();
+			ticker.speed=$("#tickerSpeed").val();
+			ticker.text=$("#tickerText").val();
+			ticker.color=$("#tickerColor").val();
+			ticker.bgColor=$("#tickerBgColor").val();
+
+			grand=$('#grand').val().split(/\n/);
+
+			websocket.send(JSON.stringify({type:"update", spool:spool, ticker:ticker, grand:grand, showing:showing}));
+		}
+	}
+	function toggleDebug(bool){
+		websocket.send(JSON.stringify({type:"debug", debug:bool}));
+	}
+
+	$(document).on("click", "#debug", function(){
+		toggleDebug(!debug);
+	});
+	$(document).on("change", ".setting", function(){
 		sendUpdate();
-	}
-});
+	});
+	$(document).on("change", ".showing", function(){
+		sendUpdate();
+	});
+
+	$(document).on("click", "#tickerGo", function(){
+		ticker.go=!ticker.go;
+		sendUpdate();
+	});
+	$(document).on("click", "#spoolGo", function(){
+		spool.go=!spool.go;
+		sendUpdate();
+	});
+
+	$(document).on("change", ".mainSelect", function(){
+		if($("input[name=mainSelect]:checked").val()=="spool"||$("input[name=mainSelect]:checked").val()=="grand"){
+			$("#spoolSettings").show();
+		} else{
+			$("#slideshowSettings").show();
+		}
+	});
+
+	$(document).on("click", ".prizesTitle", function(){
+		if($(this).has("input").length==0){
+			var group=$(this).attr("id").replace("prizesTitle", "");
+			$(this).html('<input type="text" class="editTitle" id="editTitle'+group+'" value="'+spool.titles[group]+'"></input>');
+			$("#editTitle"+group).focus();
+		}
+	});
+
+	$(document).on("keypress", ".editTitle", function(e){
+		if(e.keyCode==13) $(this).trigger("blur");
+	});
+	$(document).on("blur", ".editTitle", function(){
+		var group=$(this).attr("id").replace("editTitle", "");
+		spool.titles[group]=$(this).val();
+		sendUpdate();
+	});
 
 
-$(document).on("click", ".prizesNum", function(){
-	if($(this).has("input").length==0){
-		var group=$(this).closest("table").attr("id").replace("prizes", "");
-		var num=$(this).parent().attr("id").replace("itemRow", "");
-		$(this).html('<input type="text" class="editNum" id="editNum'+group+'-'+num+'" value="'+spool.prizes[group][num].number+'"></input>');
-		$("#editNum"+group+"-"+num).focus();
-	}
-});
-$(document).on("keypress", ".editNum", function(e){
-	if(e.keyCode==13) $(this).trigger("blur");
-});
-$(document).on("blur", ".editNum", function(){
-	var id=$(this).attr("id").replace("editNum", "");
-	var group=id.split("-")[0];
-	var num=id.split("-")[1];
-	spool.prizes[group][num].number=$(this).val();
-	sendUpdate();
-});
-
-
-$(document).on("click", ".prizesDescription", function(){
-	if($(this).has("input").length==0){
-		var group=$(this).closest("table").attr("id").replace("prizes", "");
-		var num=$(this).parent().attr("id").replace("itemRow", "");
-		$(this).html('<input type="text" class="editDec" id="editDec'+group+'-'+num+'" value="'+spool.prizes[group][num].description+'"></input>');
-		$("#editDec"+group+"-"+num).focus();
-	}
-});
-$(document).on("keypress", ".editDec", function(e){
-	if(e.keyCode==13) $(this).trigger("blur");
-});
-$(document).on("blur", ".editDec", function(){
-	var id=$(this).attr("id").replace("editDec", "");
-	var group=id.split("-")[0];
-	var num=id.split("-")[1];
-	spool.prizes[group][num].description=$(this).val();
-	sendUpdate();
-});
-
-
-$(document).on("click", ".prizesWinner", function(){
-	if($(this).has("input").length==0){
-		var group=$(this).closest("table").attr("id").replace("prizes", "");
-		var num=$(this).parent().attr("id").replace("itemRow", "");
-		$(this).html('<input type="text" class="editWinner" id="editWinner'+group+'-'+num+'" value="'+spool.prizes[group][num].winner+'"></input>');
-		$("#editWinner"+group+"-"+num).focus();
-	}
-});
-$(document).on("keypress", ".editWinner", function(e){
-	if(e.keyCode==13) $(this).trigger("blur");
-});
-$(document).on("blur", ".editWinner", function(){
-	var id=$(this).attr("id").replace("editWinner", "");
-	var group=id.split("-")[0];
-	var num=id.split("-")[1];
-	spool.prizes[group][num].winner=$(this).val();
-	sendUpdate();
-});
-
-
-$(document).on("change", ".prizesCollectedTick", function(){
-	var group=$(this).closest("table").attr("id").replace("prizes", "");
-	var num=$(this).parent().parent().attr("id").replace("itemRow", "");
-	spool.prizes[group][num].collected=$(this).prop("checked");
-	sendUpdate();
-});
-
-
-$(document).on("click", ".itemDelete", function(){
-	var group=$(this).closest("table").attr("id").replace("prizes", "");
-	var num=$(this).parent().parent().attr("id").replace("itemRow", "");
-	var item=spool.prizes[group][num];
-	if(spool.prizes[group].length<2) alert("You must leave at least one item per group");
-	else{
-		if(confirm("Are you sure you want to delete:\n"+item.number+"\n"+item.description+"\n"+item.winner)){
-			spool.prizes[group].splice(num, 1);
+	$(document).on("click", ".groupDelete", function(){
+		var group=$(this).attr("id").replace("groupDelete", "");
+		console.log(group);
+		if(confirm("Are you sure you want to delete the group:\n"+spool.titles[group]+"\nand "+spool.prizes[group].length+" items?")){
+			spool.prizes.splice(group, 1);
+			spool.titles.splice(group, 1);
 			sendUpdate();
 		}
+	});
+
+
+	$(document).on("click", ".prizesNum", function(){
+		if($(this).has("input").length==0){
+			var group=$(this).closest("table").attr("id").replace("prizes", "");
+			var num=$(this).parent().attr("id").replace("itemRow", "");
+			$(this).html('<input type="text" class="editNum" id="editNum'+group+'-'+num+'" value="'+spool.prizes[group][num].number+'"></input>');
+			$("#editNum"+group+"-"+num).focus();
+		}
+	});
+	$(document).on("keypress", ".editNum", function(e){
+		if(e.keyCode==13) $(this).trigger("blur");
+	});
+	$(document).on("blur", ".editNum", function(){
+		var id=$(this).attr("id").replace("editNum", "");
+		var group=id.split("-")[0];
+		var num=id.split("-")[1];
+		spool.prizes[group][num].number=$(this).val();
+		sendUpdate();
+	});
+
+
+	$(document).on("click", ".prizesDescription", function(){
+		if($(this).has("input").length==0){
+			var group=$(this).closest("table").attr("id").replace("prizes", "");
+			var num=$(this).parent().attr("id").replace("itemRow", "");
+			$(this).html('<input type="text" class="editDec" id="editDec'+group+'-'+num+'" value="'+spool.prizes[group][num].description+'"></input>');
+			$("#editDec"+group+"-"+num).focus();
+		}
+	});
+	$(document).on("keypress", ".editDec", function(e){
+		if(e.keyCode==13) $(this).trigger("blur");
+	});
+	$(document).on("blur", ".editDec", function(){
+		var id=$(this).attr("id").replace("editDec", "");
+		var group=id.split("-")[0];
+		var num=id.split("-")[1];
+		spool.prizes[group][num].description=$(this).val();
+		sendUpdate();
+	});
+
+
+	$(document).on("click", ".prizesWinner", function(){
+		if($(this).has("input").length==0){
+			var group=$(this).closest("table").attr("id").replace("prizes", "");
+			var num=$(this).parent().attr("id").replace("itemRow", "");
+			$(this).html('<input type="text" class="editWinner" id="editWinner'+group+'-'+num+'" value="'+spool.prizes[group][num].winner+'"></input>');
+			$("#editWinner"+group+"-"+num).focus();
+		}
+	});
+	$(document).on("keypress", ".editWinner", function(e){
+		if(e.keyCode==13) $(this).trigger("blur");
+	});
+	$(document).on("blur", ".editWinner", function(){
+		var id=$(this).attr("id").replace("editWinner", "");
+		var group=id.split("-")[0];
+		var num=id.split("-")[1];
+		spool.prizes[group][num].winner=$(this).val();
+		sendUpdate();
+	});
+
+
+	$(document).on("change", ".prizesCollectedTick", function(){
+		var group=$(this).closest("table").attr("id").replace("prizes", "");
+		var num=$(this).parent().parent().attr("id").replace("itemRow", "");
+		spool.prizes[group][num].collected=$(this).prop("checked");
+		sendUpdate();
+	});
+
+
+	$(document).on("click", ".itemDelete", function(){
+		var group=$(this).closest("table").attr("id").replace("prizes", "");
+		var num=$(this).parent().parent().attr("id").replace("itemRow", "");
+		var item=spool.prizes[group][num];
+		if(spool.prizes[group].length<2) alert("You must leave at least one item per group");
+		else{
+			if(confirm("Are you sure you want to delete:\n"+item.number+"\n"+item.description+"\n"+item.winner)){
+				spool.prizes[group].splice(num, 1);
+				sendUpdate();
+			}
+		}
+	});
+
+	$(document).on("click", ".addItem", function(){
+		var group=$(this).closest("table").attr("id").replace("prizes", "");
+		var number="";
+		if(spool.prizes[group][spool.prizes[group].length-1]) number=Number(spool.prizes[group][spool.prizes[group].length-1].number)+1;
+		spool.prizes[group].push({number:number, description:"", winner:"", collected:false});
+		sendUpdate();
+	});
+
+
+	$(document).on("click", ".addGroup", function(){
+		spool.prizes.push([{number:"", description:"", winner:"", collected:false}]);
+		spool.titles.push("");
+		sendUpdate();
+	});
 	}
-});
+	</script>
 
-$(document).on("click", ".addItem", function(){
-	var group=$(this).closest("table").attr("id").replace("prizes", "");
-	var number="";
-	if(spool.prizes[group][spool.prizes[group].length-1]) number=Number(spool.prizes[group][spool.prizes[group].length-1].number)+1;
-	spool.prizes[group].push({number:number, description:"", winner:"", collected:false});
-	sendUpdate();
-});
+	<h1 style="width:100%;text-align:center;">Control Page</h1>
+	<a href="files/spool.html" target="_blank" style="color:white;">Open Projector Page</a><br><br>
+	<a href="files/help.html" target="_blank" style="color:white;">Open Help Page</a><br><br>
+	<span id="runCmd" style="background:red;border:2px solid darkRed;padding:2px;">Loading...</span>
 
+	<br><hr>
 
-$(document).on("click", ".addGroup", function(){
-	spool.prizes.push([{number:"", description:"", winner:"", collected:false}]);
-	spool.titles.push("");
-	sendUpdate();
-});
-}
-</script>
-<h1 style="width:100%;text-align:center;">Controls</h1>
-<a href="files/spool.html" target="_blank" style="color:white;">Open Projector Page</a><br><br>
-<a href="files/help.html" target="_blank" style="color:white;">Open Help Page</a><br><br>
-<span id="runCmd" style="background:red;border:2px solid darkRed;padding:2px;">Loading...</span><br><br>
-Debug:<input type="button" id="debug" value="Off"></input>
+	<h1>Currently Showing</h1>
+	<label><input type="radio" name="mainSelect" class="setting mainSelect" id="mainSelectSpool" value="spool"></input>Prize Spool</label><br>
+	<label><input type="radio" name="mainSelect" class="setting mainSelect" id="mainSelectGrand" value="grand"></input>Grand Prize Display</label><br>
 
-<br><hr>
+	<br><hr>
 
-<div id="settings" style="display:none;">
-<h1>Ticker</h1>
-<label>Enabled:<input type="checkbox" id="tickerEnable" class="setting"></input></label><br>
-Scroll:<input type="button" id="tickerGo" value=""></input><br>
-Position:<div style="display:inline-block;vertical-align:top;"><label><input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositiontop" value="top"></input>Top</label><br>
-<label><input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositionbottom" value="bottom"></input>Bottom</label></div><br>
+	<div id="settings" style="display:none;">
+	<div id="spoolSettings" style="display:none;">
+		<h1>Prize Spool</h1>
+		Scroll:<input type="button" id="spoolGo" value=""></input><br>
+		Spool Speed:<select id="spoolSpeed" value="20" class="setting"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
+		<label>Spool Text Color:<input type="color" id="spoolColor" class="setting"></input></label><br>
+		Spool Background 1 &amp; 2:<input type="color" id="spoolBgColor1" class="setting"></input><input type="color" id="spoolBgColor2" class="setting"></input><br>
+	</div>
 
-<label>Ticker Text:<input type="text" id="tickerText" class="setting"></input></label><br>
-Ticker Speed:<select id="tickerSpeed" value="20" class="setting"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
-<label>Ticker Text Color:<input type="color" id="tickerColor" class="setting"></input></label><br>
-Ticker Background:<input type="color" id="tickerBgColor" class="setting"></input><br>
+	<br><hr>
 
-<br><hr><br>
+	<h1>Grand Prize Display</h1>
+	Grand Prize Text: (Use Multiple Lines)<br>
+	<textarea id="grand" rows="3" class="setting"></textarea><br>
 
-<label><input type="radio" name="mainSelect" class="setting mainSelect" id="mainSelectSpool" value="spool"></input>Spool</label><br>
-<label><input type="radio" name="mainSelect" class="setting mainSelect" id="mainSelectGrand" value="grand"></input>Grand Prize</label><br>
-<label><input type="radio" name="mainSelect" class="setting mainSelect" id="mainSelectSlideshow" value="slideshow" disabled></input>Slideshow</label><br>
-
-<br><hr>
-
-<div id="spoolSettings" style="display:none;">
-<h1>Spool</h1>
-<label>Spool Showing:<input type="text" id="spoolShowing" class="setting"></input></label><br>
-Scroll:<input type="button" id="spoolGo" value=""></input><br>
-Spool Speed:<select id="spoolSpeed" value="20" class="setting"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
-<label>Spool Text Color:<input type="color" id="spoolColor" class="setting"></input></label><br>
-Spool Background 1 &amp; 2:<input type="color" id="spoolBgColor1" class="setting"></input><input type="color" id="spoolBgColor2" class="setting"></input><br>
-<br>
-Grand Prize Text: (Use Multiple Lines)<br>
-<textarea id="grand" rows="3" class="setting"></textarea><br>
-</div>
-
-<div id="slideshowSettings" style="display:none;">
-<h1>Slideshow</h1>
-</div>
+	<br><hr>
 
 
-<br><hr>
+	<h1>Doner Ticker</h1>
+	<label>Enabled:<input type="checkbox" id="tickerEnable" class="setting"></input></label><br>
+	Scroll Movement:<input type="button" id="tickerGo" value=""></input><br>
+	Position:<div style="display:inline-block;vertical-align:top;"><label><input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositiontop" value="top"></input>Top</label><br>
+	<label><input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositionbottom" value="bottom"></input>Bottom</label></div><br>
 
-<h1>Prizes</h1>
-<div id="prizes"></div>
+	<label>Ticker Text:<input type="text" id="tickerText" class="setting"></input></label><br>
+	Ticker Speed:<select id="tickerSpeed" value="20" class="setting"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
+	<label>Ticker Text Color:<input type="color" id="tickerColor" class="setting"></input></label><br>
+	Ticker Background Color:<input type="color" id="tickerBgColor" class="setting"></input><br>
 
+	<br><hr>
 
+	<h1>Prize List</h1>
+	<div id="prizes"></div>
 
+	<br><hr><br>
 
-</div>
-<div style="position:fixed;bottom:10;right:10;">Code by <a href="https://brycejmeyer.com/" style="color:orange;" target="_blank">Bryce J. Meyer</a></div>
-</body>
+	Debugging:<input type="button" id="debug" value="Off"></input>
+
+	</div>
+	<div style="position:fixed;bottom:10;right:10;">Code by <a href="https://brycejmeyer.com/" style="color:orange;" target="_blank">Bryce J. Meyer</a></div>
+	</body>
 </html>
