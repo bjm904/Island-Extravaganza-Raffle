@@ -1,16 +1,16 @@
-console.log("Version 2.3");
+console.log("Version 2.4");
 console.log("Created by Bryce J. Meyer");
 console.log("https://brycejmeyer.com/");
 console.log("For Disabled Sports Eastern Sierra");
 console.log("");
-console.log("Open Controls.html in a browser to start");
+console.log("Open controls.html in a browser to start");
 console.log("");
 
 var opened;
 var openInterval=setInterval(function(){
 	if(!opened){
 		console.log("");
-		console.log("Open Controls.html in a browser to start");
+		console.log("Open controls.html in a browser to start");
 		console.log("");
 	} else{
 		clearInterval(openInterval);
