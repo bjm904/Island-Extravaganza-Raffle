@@ -80,7 +80,7 @@ var grand=["Grand Prize","Trip For Two","Jhon Doe"];
 
 var raw;
 
-fs.exists('../database', function(exists){
+fs.exists('database', function(exists){
 	var flag;
 	if(!exists){
 		saveDb();
@@ -102,7 +102,7 @@ fs.exists('../database', function(exists){
 });
 
 function saveDb(){
-	fs.writeFile("../database", JSON.stringify({spool:spool, ticker:ticker, grand:grand, showing:showing}), function(err){
+	fs.writeFile("database", JSON.stringify({spool:spool, ticker:ticker, grand:grand, showing:showing}), function(err){
 		if(err){
 			log(err);
 		} else{
