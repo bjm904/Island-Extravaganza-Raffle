@@ -6,6 +6,9 @@
 		<script type="text/javascript" src="files/jquery-2.1.1.min.js"></script>
 		<title>Control Page</title>
 		<style>
+		body {
+			font-family: Arial;
+		}
 		.tableLabels{
 			font-weight:bold;
 			background:#333333;
@@ -88,7 +91,7 @@
 
 			$("#prizes").html('');
 			for(g=1;g<spool.prizes.length;g++){
-				$("#prizes").append('<span class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</span><input type="checkbox" id="showing'+g+'" class="showing" '+((spool.showing.indexOf(g)>-1)?"checked":"")+'></input><input type="button" id="groupDelete'+g+'" class="groupDelete" value="Delete Group"></input><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td class="tableLabels">Number</td><td class="tableLabels">Description</td><td class="tableLabels">Winner</td><td class="tableLabels">Collected</td><td class="tableLabels">Delete</td></tr></table>');
+				$("#prizes").append('<span class="prizesTitle" id="prizesTitle'+g+'" style="display:inline-block;font-size:25px;">'+(spool.titles[g]||"[Click to Add Title]")+'</span><input type="checkbox" id="showing'+g+'" class="showing" '+((spool.showing.indexOf(g)>-1)?"checked":"")+'></input><input type="button" id="groupDelete'+g+'" class="groupDelete" value="Delete Group"></input><br /><br /><table id="prizes'+g+'"  style="margin-bottom:50px;"><tr><td class="tableLabels">Number</td><td class="tableLabels">Description</td><td class="tableLabels">Winner</td><td class="tableLabels">Collected</td><td class="tableLabels">Delete</td></tr></table>');
 				for(i=0;i<spool.prizes[g].length;i++){
 					var item=spool.prizes[g][i];
 					$("#prizes"+g).append('<tr id="itemRow'+i+'"><td class="prizesNum" style="padding:10px;border-bottom:1px solid white;">'+(item.number||"[Click to Add Number]")+'</td><td class="prizesDescription" style="padding:10px;border-bottom:1px solid white;">'+(item.description||"[Click to Add Description]")+'</td><td class="prizesWinner" style="padding:10px;border-bottom:1px solid white;">'+(item.winner||"[Click to Add Winner]")+'</td><td class="prizesCollected" style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="checkbox" class="prizesCollectedTick" '+((item.collected)?"checked":"")+'></input></td><td style="padding:10px;border-bottom:1px solid white;text-align:center;"><input type="button" class="itemDelete" value="x"></input></td></tr>');
@@ -298,7 +301,7 @@
 	<a href="files/help.html" target="_blank" style="color:white;">Open Help Page</a><br><br>
 	<span id="runCmd" style="background:red;border:2px solid darkRed;padding:2px;">Loading...</span>
 
-	<br><hr>
+	<hr>
 
 	<h1>Currently Showing</h1>
 	<label><input type="radio" name="mainSelect" class="setting mainSelect" id="mainSelectSpool" value="spool"></input>Prize Spool</label><br>
@@ -309,32 +312,152 @@
 	<div id="settings" style="display:none;">
 	<div id="spoolSettings" style="display:none;">
 		<h1>Prize Spool</h1>
-		Scroll:<input type="button" id="spoolGo" value=""></input><br>
-		Spool Speed:<select id="spoolSpeed" value="20" class="setting"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
-		<label>Spool Text Color:<input type="color" id="spoolColor" class="setting"></input></label><br>
-		Spool Background 1 &amp; 2:<input type="color" id="spoolBgColor1" class="setting"></input><input type="color" id="spoolBgColor2" class="setting"></input><br>
+		<table>
+			<tr>
+				<td>
+					Scroll Action
+				</td>
+				<td>
+					<input type="button" id="spoolGo" value=""></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Spool Speed
+				</td>
+				<td>
+					<select id="spoolSpeed" value="20" class="setting">
+						<option value="20">90</option>
+						<option value="25">85</option>
+						<option value="30">80</option>
+						<option value="35">75</option>
+						<option value="40">70</option>
+						<option value="45">65</option>
+						<option value="50">60</option>
+						<option value="55">55</option>
+						<option value="60">50</option>
+						<option value="65">45</option>
+						<option value="70">40</option>
+						<option value="75">35</option>
+						<option value="80">30</option>
+						<option value="85">25</option>
+						<option value="90">20</option>
+					</select>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					Spool Text Color
+				</td>
+				<td>
+					<input type="color" id="spoolColor" class="setting"></input>
+				</td>
+			</tr>
+			<tr>
+				<td>
+				Spool Background 1 &amp; 2
+			</td>
+			<td>
+				<input type="color" id="spoolBgColor1" class="setting"></input><input type="color" id="spoolBgColor2" class="setting"></input>
+			</td>
+		</tr>
+	</table>
 	</div>
 
 	<br><hr>
 
 	<h1>Grand Prize Display</h1>
-	Grand Prize Text: (Use Multiple Lines)<br>
-	<textarea id="grand" rows="3" class="setting"></textarea><br>
+	Grand Prize Text (Use Multiple Lines)<br>
+	<textarea id="grand" rows="5" class="setting" style="width:400px"></textarea><br>
 
 	<br><hr>
 
 
 	<h1>Doner Ticker</h1>
-	<label>Enabled:<input type="checkbox" id="tickerEnable" class="setting"></input></label><br>
-	Scroll Movement:<input type="button" id="tickerGo" value=""></input><br>
-	Position:<div style="display:inline-block;vertical-align:top;"><label><input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositiontop" value="top"></input>Top</label><br>
-	<label><input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositionbottom" value="bottom"></input>Bottom</label></div><br>
-
-	<label>Ticker Text:<input type="text" id="tickerText" class="setting"></input></label><br>
-	Ticker Speed:<select id="tickerSpeed" value="20" class="setting"><option value="20">90</option><option value="25">85</option><option value="30">80</option><option value="35">75</option><option value="40">70</option><option value="45">65</option><option value="50">60</option><option value="55">55</option><option value="60">50</option><option value="65">45</option><option value="70">40</option><option value="75">35</option><option value="80">30</option><option value="85">25</option><option value="90">20</option></select><br>
-	<label>Ticker Text Color:<input type="color" id="tickerColor" class="setting"></input></label><br>
-	Ticker Background Color:<input type="color" id="tickerBgColor" class="setting"></input><br>
-
+	<table>
+		<tr>
+			<td>
+				Show Ticker
+			</td>
+			<td>
+				<input type="checkbox" id="tickerEnable" class="setting"></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Scroll Movement
+			</td>
+			<td>
+				<input type="button" id="tickerGo" value=""></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Position
+			</td>
+			<td>
+				<div style="display:inline-block;vertical-align:top;">
+					<label>
+						<input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositiontop" value="top"></input>
+						Top
+					</label>
+					<br />
+					<label>
+						<input type="radio" name="tickerPosition" class="setting tickerPosition" id="tickerPositionbottom" value="bottom"></input>
+						Bottom
+					</label>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Ticker Text
+			</td>
+			<td>
+				<input type="text" id="tickerText" class="setting"></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Ticker Speed
+			</td>
+			<td>
+				<select id="tickerSpeed" value="20" class="setting">
+					<option value="20">90</option>
+					<option value="25">85</option>
+					<option value="30">80</option>
+					<option value="35">75</option>
+					<option value="40">70</option>
+					<option value="45">65</option>
+					<option value="50">60</option>
+					<option value="55">55</option>
+					<option value="60">50</option>
+					<option value="65">45</option>
+					<option value="70">40</option>
+					<option value="75">35</option>
+					<option value="80">30</option>
+					<option value="85">25</option>
+					<option value="90">20</option>
+				</select>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Ticker Text Color
+			</td>
+			<td>
+				<input type="color" id="tickerColor" class="setting"></input>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				Ticker Background Color
+			</td>
+			<td>
+				<input type="color" id="tickerBgColor" class="setting"></input>
+			</td>
+		</tr>
+	</table>
 	<br><hr>
 
 	<h1>Prize List</h1>
