@@ -39,12 +39,12 @@ if(browser != true){
 			canvas.width=$(window).width()
 			canvas.height=$(window).height();
 			context.textBaseline="middle";
-			if(ticker.go){
+			if(ticker && ticker.go){
 				stop("ticker", function(){
 					go("ticker");
 				});
 			}
-			if(spool.go){
+			if(spool && spool.go){
 				stop("spool", function(){
 					go("spool");
 				});
@@ -164,6 +164,12 @@ if(browser != true){
 		context.fillStyle=ticker.color;
 		context.font=fontSize+"px MerriweatherSans";
 		context.fillText(ticker.text||"No Data to Display", tickerOffset, ((ticker.position=="top")?tickerHeight/2:canvas.height-tickerHeight/2));
+	}
+	if (!spool && !ticker) {
+		context.textAlign="center";
+		context.fillStyle="#ffffff";
+		context.font="45px Arial";
+		context.fillText('Please double click start.cmd', canvas.width/2, canvas.height/2);
 	}
 	statsDraw.end();
 	}
