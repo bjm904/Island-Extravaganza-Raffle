@@ -22,214 +22,212 @@
 <canvas id="canvas" style="padding:0px;margin:0px;"></canvas>
 <script type="text/javascript">
 if(browser != true){
-document.write("Please use Google Chrome");
+	document.write("Please use Google Chrome");
 } else{
+	var imgcheck=new Image();
+	imgcheck.src="check.png";
 
+	var canvas=document.getElementById("canvas");
+	var context=canvas.getContext("2d");
+	canvas.width=$(window).width()
+	canvas.height=$(window).height();
+	context.textBaseline="middle";
+	var tickerOffset=0;
+	var list=[];
+	var spoolInterval;
+	var tickerInterval;
+	var gotFromServer;
+	var debug;
+	var errorText = "Loading...";
 
-var imgcheck=new Image();
-imgcheck.src="check.png";
+	var showing;
+	var ticker;
+	var spool;
+	var grand;
 
+	var statsDraw = new Stats();
+	statsDraw.setMode(0);
+	var statsTickSpool = new Stats();
+	statsTickSpool.setMode(1);
+	var statsTickTicker = new Stats();
+	statsTickTicker.setMode(1);
+	statsDraw.domElement.style.position = 'absolute';
+	statsDraw.domElement.style.right = '0px';
+	statsDraw.domElement.style.top = '0px';
+	document.body.appendChild(statsDraw.domElement);
+	$(statsDraw.domElement).hide();
+	statsTickSpool.domElement.style.position = 'absolute';
+	statsTickSpool.domElement.style.right = '0px';
+	statsTickSpool.domElement.style.top = '50px';
+	document.body.appendChild(statsTickSpool.domElement);
+	$(statsTickSpool.domElement).hide();
+	statsTickTicker.domElement.style.position = 'absolute';
+	statsTickTicker.domElement.style.right = '0px';
+	statsTickTicker.domElement.style.top = '100px';
+	document.body.appendChild(statsTickTicker.domElement);
+	$(statsTickTicker.domElement).hide();
 
-var canvas=document.getElementById("canvas");
-var context=canvas.getContext("2d");
-canvas.width=$(window).width()
-canvas.height=$(window).height();
-context.textBaseline="middle";
-var tickerOffset=0;
-var list=[];
-var spoolInterval;
-var tickerInterval;
-var gotFromServer;
-var debug;
-var errorText = "Loading...";
+	function draw(){
+	statsDraw.begin();
+	window.requestAnimationFrame(draw);
+	context.clearRect(0, 0, canvas.width, canvas.height);
 
-var showing;
-var ticker;
-var spool;
-var grand;
-
-var statsDraw = new Stats();
-statsDraw.setMode(0);
-var statsTickSpool = new Stats();
-statsTickSpool.setMode(1);
-var statsTickTicker = new Stats();
-statsTickTicker.setMode(1);
-statsDraw.domElement.style.position = 'absolute';
-statsDraw.domElement.style.right = '0px';
-statsDraw.domElement.style.top = '0px';
-document.body.appendChild(statsDraw.domElement);
-$(statsDraw.domElement).hide();
-statsTickSpool.domElement.style.position = 'absolute';
-statsTickSpool.domElement.style.right = '0px';
-statsTickSpool.domElement.style.top = '50px';
-document.body.appendChild(statsTickSpool.domElement);
-$(statsTickSpool.domElement).hide();
-statsTickTicker.domElement.style.position = 'absolute';
-statsTickTicker.domElement.style.right = '0px';
-statsTickTicker.domElement.style.top = '100px';
-document.body.appendChild(statsTickTicker.domElement);
-$(statsTickTicker.domElement).hide();
-
-function draw(){
-statsDraw.begin();
-window.requestAnimationFrame(draw);
-context.clearRect(0, 0, canvas.width, canvas.height);
-
-
-var fontSize=spool.padding*0.63;
-if(showing&&showing[0]=="grand"){ // IF only showing grand prize
-	var perc=(Date.now()%1000)/1000;
-	var color=perc*spool.color
-	context.textAlign="center";
-	context.font="105px Playball";
-	var height=(grand.length*100)/2;
-
-	//context.globalAlpha=perc*1;
-	context.fillStyle=spool.color;
-	for(i=0;i<grand.length;i++){
-		context.fillText(grand[i], canvas.width/2, height+(i*100));
-	}
-
-	context.globalAlpha=1-perc*1;
-	context.fillStyle="gold";
-	for(i=grand.length-1;i<grand.length;i++){
-		context.fillText(grand[i], canvas.width/2, height+(i*100));
-	}
-	context.globalAlpha=1;
-} else if(showing&&showing[0]==true){
-	if(list.length==0){
-		context.textAlign="center";
-		context.fillStyle="#ffffff";
-		context.font="75px MerriweatherSans";
-		context.fillText(errorText, canvas.width/2, canvas.height/2);
-	}
-	for(i=0;i<list.length;i++){
-		var item=list[i];
-		context.fillStyle=(item.odd)? spool.bgColor1 : spool.bgColor2;
-		context.fillRect(0,item.y,canvas.width,spool.padding);
-		context.fillStyle=spool.color;
-		context.font=fontSize+"px MerriweatherSans";
-		if("title" in item){
+	if (spool) {
+		var fontSize=spool.padding*0.63;
+		if(showing&&showing[0]=="grand"){ // IF only showing grand prize
+			var perc=(Date.now()%1000)/1000;
+			var color=perc*spool.color
 			context.textAlign="center";
-			context.fillText(item.title, canvas.width/2, item.y+spool.padding/2);
-		} else{
-			context.textAlign="left";
-			context.fillText(spool.prizes[item.group][item.id].number, 20, item.y+spool.padding/2);
-			context.fillText(spool.prizes[item.group][item.id].description, 40+context.measureText(spool.prizes[item.group][item.id].number).width, item.y+spool.padding/2);
-			context.fillText(spool.prizes[item.group][item.id].winner, canvas.width-(((spool.padding*0.4)+40)+context.measureText("Bryce Jonathan R Rivas").width), item.y+spool.padding/2);
-			if(spool.prizes[item.group][item.id].collected){
-				context.drawImage(imgcheck, canvas.width-((spool.padding*0.4)+20), item.y+(spool.padding-spool.padding*0.4)/2, spool.padding*0.4, spool.padding*0.4);
-			}
-		}
-	}
-} else{
-	context.textAlign="center";
-	context.fillStyle="#ffffff";
-	context.font="75px Arial";
-	context.fillText(errorText, canvas.width/2, canvas.height/2);
-}
+			context.font="105px Playball";
+			var height=(grand.length*100)/2;
 
-
-if(ticker&&ticker.enable){
-	var tickerHeight=spool.padding*0.7;
-	context.fillStyle=ticker.bgColor;
-	context.fillRect(0, ((ticker.position=="top")?0:canvas.height-tickerHeight), canvas.width, tickerHeight);
-
-	context.fillStyle=ticker.color;
-	context.font=fontSize+"px MerriweatherSans";
-	context.fillText(ticker.text||"No Data to Display", tickerOffset, ((ticker.position=="top")?tickerHeight/2:canvas.height-tickerHeight/2));
-}
-statsDraw.end();
-}
-window.requestAnimationFrame(draw);
-
-
-function go(part){
-	if(part=="spool"){
-		spoolInterval = setInterval(function(){
-			statsTickSpool.begin();
-			if(list.length==0){
-				if(spool.prizes[spool.showing[0]]){
-					list.push({group:1, id:0, odd:true, y:0});
-				}
-			}
-			var flag;
-			for(i=list.length-1;i>=0;i--){
-				var item=list[i];
-				item.y--;
-				if(item.y<-spool.padding) list.splice(i, 1);
-				if(i==list.length-1&&item.y<canvas.height){
-					flag=true;
-				}
-			}
-			if(flag){
-				addNext(list[list.length-1]);
-			}
-			statsTickSpool.end();
-		}, spool.speed);
-	}
-	if(part=="ticker"){
-		tickerInterval = setInterval(function(){
-			statsTickTicker.begin();
-			tickerOffset--;
-			if(-tickerOffset>context.measureText(ticker.text).width) tickerOffset=canvas.width;
-			statsTickTicker.end();
-		}, ticker.speed);
-	}
-}
-function stop(part, cb){
-	if(part=="spool"){
-		clearInterval(spoolInterval);
-		spoolInterval=false;
-	}
-	if(part=="ticker"){
-		clearInterval(tickerInterval);
-		tickerInterval=false;
-	}
-	if(cb) cb(part);
-}
-function addNext(item){
-	var exists=getByNumber(Number(spool.prizes[item.group][item.id].number)+1);
-	var id;
-	if(exists){
-		list.push({group:item.group, id:exists, odd:!item.odd, y:item.y+spool.padding});
-	} else{
-		var odd=!item.odd;
-		list.push({group:0, id:0, odd:odd, y:item.y+spool.padding});
-		odd=!odd;
-		if(spool.prizes[spool.showing[spool.showing.indexOf(item.group)+1]]){
-			list.push({title:spool.titles[item.group+1], y:item.y+spool.padding*2, odd:odd});
-			odd=!odd;
-			list.push({group:item.group+1, id:0, odd:odd, y:item.y+spool.padding*3});
-			odd=!odd;
-		} else{
-			var addY=spool.padding*2;
+			//context.globalAlpha=perc*1;
+			context.fillStyle=spool.color;
 			for(i=0;i<grand.length;i++){
-				list.push({title:grand[i], y:item.y+addY, odd:odd});
-				addY+=spool.padding;
-				odd=!odd;
+				context.fillText(grand[i], canvas.width/2, height+(i*100));
 			}
-			if(grand.length>0){
-				list.push({group:0, id:0, odd:odd, y:item.y+addY});
-				addY+=spool.padding;
-				odd=!odd;
-			}
-			list.push({title:spool.titles[1], y:item.y+addY, odd:odd});
-			addY+=spool.padding;
-			odd=!odd;
-			list.push({group:1, id:0, odd:!item.odd, y:item.y+addY, odd:odd});
-		}
-	}
-}
 
-function getByNumber(num){
-	for(g=0;g<spool.prizes.length;g++){
-		for(i=0;i<spool.prizes[g].length;i++){
-			if(spool.prizes[g][i].number==num) return i;
+			context.globalAlpha=1-perc*1;
+			context.fillStyle="gold";
+			for(i=grand.length-1;i<grand.length;i++){
+				context.fillText(grand[i], canvas.width/2, height+(i*100));
+			}
+			context.globalAlpha=1;
+		} else if(showing&&showing[0]==true){
+			if(list.length==0){
+				context.textAlign="center";
+				context.fillStyle="#ffffff";
+				context.font="75px MerriweatherSans";
+				context.fillText(errorText, canvas.width/2, canvas.height/2);
+			}
+			for(i=0;i<list.length;i++){
+				var item=list[i];
+				context.fillStyle=(item.odd)? spool.bgColor1 : spool.bgColor2;
+				context.fillRect(0,item.y,canvas.width,spool.padding);
+				context.fillStyle=spool.color;
+				context.font=fontSize+"px MerriweatherSans";
+				if("title" in item){
+					context.textAlign="center";
+					context.fillText(item.title, canvas.width/2, item.y+spool.padding/2);
+				} else{
+					context.textAlign="left";
+					context.fillText(spool.prizes[item.group][item.id].number, 20, item.y+spool.padding/2);
+					context.fillText(spool.prizes[item.group][item.id].description, 40+context.measureText(spool.prizes[item.group][item.id].number).width, item.y+spool.padding/2);
+					context.fillText(spool.prizes[item.group][item.id].winner, canvas.width-(((spool.padding*0.4)+40)+context.measureText("Bryce Jonathan R Rivas").width), item.y+spool.padding/2);
+					if(spool.prizes[item.group][item.id].collected){
+						context.drawImage(imgcheck, canvas.width-((spool.padding*0.4)+20), item.y+(spool.padding-spool.padding*0.4)/2, spool.padding*0.4, spool.padding*0.4);
+					}
+				}
+			}
+		} else{
+			context.textAlign="center";
+			context.fillStyle="#ffffff";
+			context.font="75px Arial";
+			context.fillText(errorText, canvas.width/2, canvas.height/2);
 		}
 	}
-	return false;
-}
+
+
+	if(ticker&&ticker.enable){
+		var tickerHeight=spool.padding*0.7;
+		context.fillStyle=ticker.bgColor;
+		context.fillRect(0, ((ticker.position=="top")?0:canvas.height-tickerHeight), canvas.width, tickerHeight);
+
+		context.fillStyle=ticker.color;
+		context.font=fontSize+"px MerriweatherSans";
+		context.fillText(ticker.text||"No Data to Display", tickerOffset, ((ticker.position=="top")?tickerHeight/2:canvas.height-tickerHeight/2));
+	}
+	statsDraw.end();
+	}
+	window.requestAnimationFrame(draw);
+
+
+	function go(part){
+		if(part=="spool"){
+			spoolInterval = setInterval(function(){
+				statsTickSpool.begin();
+				if(list.length==0){
+					if(spool.prizes[spool.showing[0]]){
+						list.push({group:1, id:0, odd:true, y:0});
+					}
+				}
+				var flag;
+				for(i=list.length-1;i>=0;i--){
+					var item=list[i];
+					item.y--;
+					if(item.y<-spool.padding) list.splice(i, 1);
+					if(i==list.length-1&&item.y<canvas.height){
+						flag=true;
+					}
+				}
+				if(flag){
+					addNext(list[list.length-1]);
+				}
+				statsTickSpool.end();
+			}, spool.speed);
+		}
+		if(part=="ticker"){
+			tickerInterval = setInterval(function(){
+				statsTickTicker.begin();
+				tickerOffset--;
+				if(-tickerOffset>context.measureText(ticker.text).width) tickerOffset=canvas.width;
+				statsTickTicker.end();
+			}, ticker.speed);
+		}
+	}
+	function stop(part, cb){
+		if(part=="spool"){
+			clearInterval(spoolInterval);
+			spoolInterval=false;
+		}
+		if(part=="ticker"){
+			clearInterval(tickerInterval);
+			tickerInterval=false;
+		}
+		if(cb) cb(part);
+	}
+	function addNext(item){
+		var exists=getByNumber(Number(spool.prizes[item.group][item.id].number)+1);
+		var id;
+		if(exists){
+			list.push({group:item.group, id:exists, odd:!item.odd, y:item.y+spool.padding});
+		} else{
+			var odd=!item.odd;
+			list.push({group:0, id:0, odd:odd, y:item.y+spool.padding});
+			odd=!odd;
+			if(spool.prizes[spool.showing[spool.showing.indexOf(item.group)+1]]){
+				list.push({title:spool.titles[item.group+1], y:item.y+spool.padding*2, odd:odd});
+				odd=!odd;
+				list.push({group:item.group+1, id:0, odd:odd, y:item.y+spool.padding*3});
+				odd=!odd;
+			} else{
+				var addY=spool.padding*2;
+				for(i=0;i<grand.length;i++){
+					list.push({title:grand[i], y:item.y+addY, odd:odd});
+					addY+=spool.padding;
+					odd=!odd;
+				}
+				if(grand.length>0){
+					list.push({group:0, id:0, odd:odd, y:item.y+addY});
+					addY+=spool.padding;
+					odd=!odd;
+				}
+				list.push({title:spool.titles[1], y:item.y+addY, odd:odd});
+				addY+=spool.padding;
+				odd=!odd;
+				list.push({group:1, id:0, odd:!item.odd, y:item.y+addY, odd:odd});
+			}
+		}
+	}
+
+	function getByNumber(num){
+		for(g=0;g<spool.prizes.length;g++){
+			for(i=0;i<spool.prizes[g].length;i++){
+				if(spool.prizes[g][i].number==num) return i;
+			}
+		}
+		return false;
+	}
 }
 
 var websocket = new ReconnectingWebSocket("ws://localhost:6458");
