@@ -31,30 +31,60 @@ This software runs in 3 main parts. The Controls Page, Projector Page, and Serve
 <br>
 The Controls Page and Projector Page are opened in browser.<br>
 <br>
-The Server runs in the background and enables communication between the Projector Page and the Controls Page. The server runs on NodeJS. See Server.
+The Server runs in the background and enables communication between the Projector Page and the Controls Page.
 <hr>
 <h1>Basic Use</h1>
 <ul>
-	<li>Double click Controls.html to open it in a browser</li>
+	<li>Double click the file controls.html to open it in a browser</li>
 	<li>Double click start.cmd</li>
 	<li>At the top of the Controls page click the link to open "Projector Page"</li>
-	<li>Move Projector Page onto the projector's display</li>
-	<li>Press F11 on the Projector Page to enter full screen</li>
+	<li>Move Projector Page Tab onto the projector's display, keep the Controls screen on your main screen</li>
+	<li>Click anywhere on the Projector Page to make it full screen</li>
 </ul>
 <hr>
 <h1>Controls Page</h1>
 
-<b>Open Projector Page</b> - Opens the prize list display page in a new window/tab<br>
+<b>Open Projector Page</b> - Opens the prize list page in a new window / tab<br>
 <br>
 <b>Open Help Page</b> - Opens this page<br>
-<br>
-<b>Debug On/Off</b> - Default Off - Shows graphs on Projector Page and enables verbose logging to the console<br>
 
-<h2>Ticker</h2>
+<br />
+<hr />
+
+<h2>Currently Showing</h2>
+
+<b>Prize Spool</b> - Will show the prize list on the projector<br>
+<br>
+<b>Grand Prize Display</b> - Will show only the grand prize on the projector<br>
+
+<br />
+<hr />
+
+<h2>Prize Spool</h2>
+<table>
+	<tr><td class="tableLabels">Name</td><td class="tableLabels">Options</td><td class="tableLabels">Default</td><td class="tableLabels">Description</td></tr>
+	<tr><td>Scroll Movement</td><td>Scrolling/Paused</td><td>Scrolling</td><td>When paused the prize list spool will not scroll</td></tr>
+	<tr><td>Spool Speed</td><td>20-90</td><td>40</td><td>How fast the prize list scrolls. Larger numbers go faster</td></tr>
+	<tr><td>Spool Text Color</td><td>Color</td><td>White</td><td>The color of the text of the prize list (spool)</td></tr>
+	<tr><td>Spool Background 1 &amp; 2</td><td>Color</td><td style="white-space:nowrap">Grey &amp; Light Grey</td><td>The two colors that alternate to create the background of the prize list</td></tr>
+	<tr><td></td><td></td><td style="white-space:nowrap">Grand Prize<br>Trip For Two<br>Jhon Doe</td><td>The Text that is displayed in the prize list and on the Grand Prize screen. Has no minimum or maximum length. Can be multiple lines.</td></tr>
+</table>
+
+<br />
+<hr />
+
+<h2>Grand Prize Display</h2>
+The Text that is displayed in the prize list and on the Grand Prize screen. Has no minimum or maximum length. Can be multiple lines.
+
+<br />
+<br />
+<hr />
+
+<h2>Doner Ticker</h2>
 <table>
 <tr><td class="tableLabels">Name</td><td class="tableLabels">Options</td><td class="tableLabels">Default</td><td class="tableLabels">Description</td></tr>
-<tr><td>Enabled</td><td>Yes/No</td><td>Yes</td><td>If checked the Ticker is shown</td></tr>
-<tr><td>Scroll</td><td>Scrolling/Paused</td><td>Scrolling</td><td>When paused the ticker text will not move</td></tr>
+<tr><td>Show Ticker</td><td>Yes/No</td><td>Yes</td><td>If checked the Ticker is shown</td></tr>
+<tr><td>Scroll Movement</td><td>Scrolling/Paused</td><td>Scrolling</td><td>When paused the ticker text will not move</td></tr>
 <tr><td>Position</td><td>Top/Bottom</td><td>Bottom</td><td>The position of the ticker to either the top or bottom of the page</td></tr>
 <tr><td>Ticker Text</td><td></td><td>None</td><td>The text to be displayed in the Ticker. Can be unlimited length. Note: Older systems may have trouble if the text length is too long</td></tr>
 <tr><td>Ticker Speed</td><td>20-90</td><td>40</td><td>How fast the ticker text moves. Larger numbers go faster</td></tr>
@@ -62,30 +92,27 @@ The Server runs in the background and enables communication between the Projecto
 <tr><td>Ticker Background</td><td>Color</td><td>Black</td><td>The color of the background of the Ticker</td></tr>
 </table>
 
-<h2>Display</h2>
-<table>
-<tr><td class="tableLabels">Name</td><td class="tableLabels">Options</td><td class="tableLabels">Default</td><td class="tableLabels">Description</td></tr>
-<tr><td>Display</td><td style="white-space:nowrap">Spool<br>Grand Prize<br>Slideshow</td><td>Spool</td><td>Switches what is shown on the Projector Page. Spool displays the selected prize lists. Grand Prize displays only the Grand Prize Text and some fireworks. Slideshow shows a slideshow.</td></tr>
-</table>
+<br />
+<hr />
 
-<h2>Spool</h2>
-<table>
-<tr><td class="tableLabels">Name</td><td class="tableLabels">Options</td><td class="tableLabels">Default</td><td class="tableLabels">Description</td></tr>
-<tr><td>Scroll</td><td>Scrolling/Paused</td><td>Scrolling</td><td>When paused the prize list (spool) will not move</td></tr>
-<tr><td>Spool Speed</td><td>20-90</td><td>40</td><td>How fast the prize list scrolls. Larger numbers go faster</td></tr>
-<tr><td>Spool Text Color</td><td>Color</td><td>White</td><td>The color of the text of the prize list (spool)</td></tr>
-<tr><td>Spool Background 1 &amp; 2</td><td>Color</td><td style="white-space:nowrap">Grey &amp; Light Grey</td><td>The two colors that alternate to create the background of the prize list</td></tr>
-<tr><td>Grand Prize Text</td><td></td><td style="white-space:nowrap">Grand Prize<br>Trip For Two<br>Jhon Doe</td><td>The Text that is displayed in the prize list and on the Grand Prize screen. Has no minimum or maximum length. Can be multiple lines.</td></tr>
-</table>
-
-<h2>Slideshow</h2>
-<table>
-<tr><td class="tableLabels">Name</td><td class="tableLabels">Options</td><td class="tableLabels">Default</td><td class="tableLabels">Description</td></tr>
-<tr><td></td><td></td><td></td><td></td></tr>
-</table>
-<hr>
 <h1>Database</h1>
 All settings and prizes are stored in the "database" file located in the root of this software. You can and should backup this file periodically when working with this software. If the file cannot be found a new one with defaults will be created. This file will only work with this program, however you can open it with any text editor. The file is JSON encoded UTF-8.
+<br />
+<br />
+<hr>
+
+<h1>Prize List</h1>
+The prizes are organized into groups, one per drawing.
+<br />
+The groups can be shown or hidden from the projector by checking the box next to "Show this group"
+<br />
+You can click on the group name (ex: 7:30 Drwaing) to edit it.
+<br />
+You can click on the prize nuimber, description or winner to edit them.
+
+<br />
+<hr>
+<br />
 <hr>
 <h1>Compatibility</h1>
 This software is portable and does not need to be installed. However all files should be extracted before using this software.<br>
@@ -97,6 +124,8 @@ The Server runs on NodeJS. For windows the executable is included (/nodejs/node.
 For Linux, the server requires you install NodeJS or Node. The server has been tested on Ubuntu using the "NodeJs" package.<br>
 <br>
 For all systems "localhost" loopback must be available and no other programs running on port "6458".
+<br />
+<br />
 <hr>
 <h1>Included Files</h1>
 <ul>
@@ -122,6 +151,8 @@ For all systems "localhost" loopback must be available and no other programs run
 </ul></li>
 </ul>
 *Generated, Not Included
+<br />
+<br />
 <hr>
 <h1>License</h1>
 The MIT License (MIT)<br>
