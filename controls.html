@@ -13,6 +13,13 @@
 			font-weight:bold;
 			background:#333333;
 		}
+		@keyframes blinkColor {
+			from {color: white;}
+			to {color: yellow;}
+		}
+		.blinkText{
+			animation: blinkColor 0.5s linear 0.5s infinite alternate;
+		}
 		</style>
 	</head>
 	<body style="background:black;padding:20px;color:white;">
@@ -298,7 +305,7 @@
 
 	<h1 style="width:100%;text-align:center;">Control Page</h1>
 	<a href="files/spool.html" target="_blank" style="color:white;">Open Projector Page</a><br><br>
-	<a href="files/help.html" target="_blank" style="color:white;">Open Help Page</a><br><br>
+	<a href="files/help.html" target="_blank" style="color:white;">Open Help Page</a> <b class="blinkText"><- Read this!</b><br><br>
 	<span id="runCmd" style="background:red;border:2px solid darkRed;padding:2px;">Loading...</span>
 
 	<hr>
@@ -315,7 +322,7 @@
 		<table>
 			<tr>
 				<td>
-					Scroll Action
+					Scroll Movement
 				</td>
 				<td>
 					<input type="button" id="spoolGo" value=""></input>
@@ -414,7 +421,7 @@
 				Ticker Text
 			</td>
 			<td>
-				<input type="text" id="tickerText" class="setting"></input>
+				<textarea rows="8" style="width:400px" id="tickerText" class="setting"></textarea>
 			</td>
 		</tr>
 		<tr>
