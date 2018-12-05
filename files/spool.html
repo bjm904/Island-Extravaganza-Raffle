@@ -297,6 +297,17 @@ function websocketMessage(evt){
 function websocketError(evt){
 	console.log("Server Error");
 }
+
+var resizeTimeout = false;
+
+window.addEventListener('resize', function() {
+	if (resizeTimeout) {
+		clearTimeout(resizeTimeout);
+	}
+	resizeTimeout = setTimeout(function(){
+		window.location.reload();
+	}, 1000)
+});
 </script>
 </body>
 </html>
